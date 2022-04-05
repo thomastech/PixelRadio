@@ -103,7 +103,7 @@ Web page disconnects may occur randomly. Simply refresh the browser if this occu
 
 ### RELEASE NOTES
 
-```1.0B : Beta release of PixelRadio. Not for public distribution.```
+```1.0  : Apr-05-2022, PixelRadio V1.0, official release to the public.```
 
 &nbsp;&nbsp;&nbsp;
 

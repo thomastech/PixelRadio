@@ -12,4 +12,3 @@ __pycache__
 # Files with personal information
 /src/credentials.h
 /lib/ESPUI/examples/
-platformio_user.ini
