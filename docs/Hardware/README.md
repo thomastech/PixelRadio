@@ -54,6 +54,23 @@ See the [Parts List](./PartsList.md) for details to the enclosure.
 
 &nbsp;&nbsp;&nbsp;
 
+<table>
+  <tr>
+    <th>PCB VIEWS</th>
+    <th>Click each image for larger view</th>
+  </tr>
+  <tr>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/pcb_RevB1_1500.png" width="250"></td>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/pcb_RevB4_1500.png" width="250"></td>
+  </tr>
+  <tr>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/pcb_RevB2_1500.png" width="250"></td>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/pcb_RevB3_1500.png" width="250"></td>
+  </tr>
+</table>
+
+&nbsp;&nbsp;&nbsp;
+
 ---
 
 ## BASIC ASSEMBLY TIPS
