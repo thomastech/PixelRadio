@@ -1,0 +1,15 @@
+/.doxygen/doc/
+/.pio/
+/.vscode/
+!/.vscode/extensions.json
+/dist/*.html
+/node_modules/
+__pycache__
+*.ino.generic.bin
+*.gz
+*.pyc
+
+# Files with personal information
+/src/credentials.h
+/lib/ESPUI/examples/
+platformio_user.ini

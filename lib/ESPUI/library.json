@@ -1,0 +1,37 @@
+{
+  "name": "ESPUI",
+  "keywords": "espressif web interface iot control simple easy ui userinterface",
+  "description": "ESP32 and ESP8266 Web Interface Library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s00500/ESPUI.git"
+  },
+  "authors": [
+    {
+      "name": "Lukas Bachschwell",
+      "email": "lukas@lbsfilm.at",
+      "url": "https://lbsfilm.at",
+      "maintainer": true
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "ESP Async WebServer",
+      "authors": "Hristo Gochkov",
+      "frameworks": "arduino"
+    },
+    {
+      "name": "ArduinoJson",
+      "authors": "Benoit Blanchon",
+      "frameworks": "arduino"
+    },
+    {
+      "name": "LittleFS_esp32",
+      "authors": "lorol",
+      "frameworks": "arduino"
+    }
+  ],
+  "version": "2.1.0",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
