@@ -6,12 +6,13 @@
 
 PixelRadio is a FM Radio Transmitter with RDS (Radio Data System) capabilities.
 It was developed for holiday "Pixel" displays (e.g., animated Christmas lights) and house projection installations.
-This project is intended for hobbyist that not only enjoy building electronic projects, but also want to enhance their holiday light show.
+This project is intended for pixel hobbyist that not only want to enhance their holiday show but also enjoy building electronic projects.
 
 Besides transmitting audio (voice/music) to drive-by visitors, it can also send RadioText messages to RDS compatible automobile radios.
 The RadioText can be anything you want. Such as artist name or information about your animated pixel show.
 
-Please be advised that PixelRadio is NOT a commercial product. It was developed by a hobbyist for personal use.
+Please be advised that PixelRadio is NOT a commercial product.
+It was developed by a hobbyist for personal use.
 It is being shared as an open source project and further development by end-users is encouraged.
 Please feel free to use the published information to build your own PixelRadio system.
 
@@ -69,7 +70,7 @@ Here is a brief summary of PixelRadio's features.
 The project's hardware assembly is suitable for electronic circuit builders with moderate experience.
 
 Artwork files are provided for the two sided printed circuit board (PCB).
-The PCB files are in the RS274X gerber format required by commerical PC board fabricators.
+The PCB files are in the RS274X Gerber format required by commercial PC board fabricators.
 
 The soldered parts are through-hole type. No SMD components need to be soldered.
 
