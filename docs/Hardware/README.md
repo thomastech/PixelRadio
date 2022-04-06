@@ -42,11 +42,11 @@ Please visit the [Parts List](./PartsList.md) section for the project's bill-of-
 
 ## PRINTED CIRCUIT BOARD
 
-PixelRadio can be built using perfboard construction.
+PixelRadio can be built using Perfboard construction.
 However, a Printed Circuit Board (PCB) is recommended to ensure proper operation of the RF amplifier circuitry.
 
 [Artwork files](../Artwork) are provided for the two-sided PCB.
-The PCB files are in the RS274X gerber format required by commerical PC board fabricators.
+The PCB files are in the RS274X Gerber format required by commercial PC board fabricators.
 
 The PCB is 95mm x 100mm in size.
 It is specifically designed to slide into a low cost metal enclosure.
@@ -77,17 +77,32 @@ See the [Parts List](./PartsList.md) for details to the enclosure.
 
 The schematic is the main reference for building the circuitry.
 
+Flush cut all component leads on the solder side.
+Clean off all flux residue using solder manufacturer's recommendations.
+"No-clean" flux must be removed on all components in the RF circuitry area.
+
 ### JUMPER WIRES
 
 Solder jumper wires at locations L7 and J9.
 Discarded resistor or capacitor wire leads work well for this.
 It's also possible to install a 0.1" 2-Pin header at J9 and use a shorting block instead of a soldered wire.
 
+### SOCKETS
+
+Mount the ESP32 module with two 15-Pin Header Sockets.
+The added height from the sockets will provide proper clearance to the mounting tab on the 3D Printed end panel.
+
+The CD4052 IC (U1) can be installed in a 16-PIN DIP socket.
+However, using a socket at this location is not necessary.
+
+The QN8027 RF Module must be installed directly on the PCB.
+Do **NOT** use a socket to mount the RF module.
+
 ### ANTENNA
 
 The telescoping rod antenna looks nice and works well.
 However, a 30" piece of bare or insulated wire can be used in place of the telescoping antenna.
-Install the antenna so that it points upwards or downwards (vertical polarlization).
+Install the antenna so that it points upwards or downwards (vertical polarization).
 
 For more range a dipole antenna can be made from easy-to-obtain hardware store items.\
 Assembly instructions are published at the doityourselfchristmas.com site:\
@@ -95,7 +110,7 @@ Assembly instructions are published at the doityourselfchristmas.com site:\
 
 ### ON AIR SIGN
 
-A 5V or 12V LED "On Air" sign can be installed at J8. As follows:\
+A 5V or 12V LED "On Air" indicator can be installed at J8, as follows:\
 J8-1 SIG: LED Gnd (-)\
 J8-2 12V: LED 12V Power (+), max 1A\
 J8-3 5V: LED 5V Power (+), max 250mA
