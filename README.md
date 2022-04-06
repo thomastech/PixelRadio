@@ -16,6 +16,14 @@ It was developed by a hobbyist for personal use.
 It is being shared as an open source project and further development by end-users is encouraged.
 Please feel free to use the published information to build your own PixelRadio system.
 
+## WHAT IS RDS?
+
+<img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="./docs/Images/rds_logo1_325.png" width="75">
+
+The Radio Data System (RDS / RBDS) enables FM radio transmitters to send RadioText messages to RDS compatible receivers. Which is perfect for your drive-by pixel audience because late model automobiles have infotainment screens that display RDS messages while listening to the FM radio station. RadioText from commercial broadcasters typically displays the station's name and the artist/song information.
+
+With PixelRadio you can broadcast stereo music as well as send RadioText messages about your pixel light show. Such as hours of operation or details on how to donate to the hosting event's charity organization. Or use it to display the name of the songs you are currently playing. PixelRadio is flexible so you can do any combination of those things.
+
 ## IMPORTANT INFORMATION
 
 The radio transmitter employs *very low* RF power.
