@@ -3,7 +3,7 @@
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
    Version: 1.0
    Creation: Dec-16-2021
-   Revised:  Apr-05-2022
+   Revised:  Apr-06-2022
    Public Release:
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -82,7 +82,7 @@ const uint8_t CMD_TIME_MAX_SZ = 4;  // Time Command Arg length is 3 (5-900). Add
 #define  CMD_PICODE_STR      "pic"    // RDS Program Information Code.
 #define  CMD_PSN_STR         "psn"    // RadioText Program Service Name, 8 chars max.
 #define  CMD_REBOOT_STR      "reboot" // Reboot System.
-#define  CMD_RADIOTEXT_STR   "rtm"    // RadioText Message, 64 chars max. Do not remove the "=" Sign.
+#define  CMD_RADIOTEXT_STR   "rtm"    // RadioText Message, 64 chars max.
 #define  CMD_START_STR       "start"  // Start RDS using existing HTTP settings.
 #define  CMD_STOP_STR        "stop"   // Stop HTTP Controller's RDS Transmission.
 
@@ -162,7 +162,7 @@ const uint16_t FM_FREQ_SKP_MHZ = 10;     // 1MHz.
 
 // FM Radio RF
 const float PA_VOLT_MIN         = 8.1f;  // Minimum allowed voltage for Power Amp, 9V -10%.
-const float PA_VOLT_MAX         = 9.9f;  // Minimum allowed voltage for Power Amp, 9V + 10%.
+const float PA_VOLT_MAX         = 9.9f;  // Maximum allowed voltage for Power Amp, 9V + 10%.
 
 // Free Memory
 const uint32_t FREE_MEM_UPD_TIME = 1750; // Update time for Free Memory (on diagTab), in mS.

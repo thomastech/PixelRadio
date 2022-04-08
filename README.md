@@ -20,9 +20,14 @@ Please feel free to use the published information to build your own PixelRadio s
 
 <img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="./docs/Images/rds_logo1_325.png" width="75">
 
-The Radio Data System (RDS / RBDS) enables FM radio transmitters to send RadioText messages to RDS compatible receivers. Which is perfect for your drive-by pixel audience because late model automobiles have infotainment screens that display RDS messages while listening to the FM radio station. RadioText from commercial broadcasters typically displays the station's name and the artist/song information.
+Radio Data System (RDS / RBDS) enables FM radio transmitters to send RadioText messages to RDS compatible receivers.
+Which is perfect for your drive-by pixel audience because late model automobiles have infotainment screens that display RDS messages while listening to the FM radio station.
+RadioText from commercial broadcasters typically displays the station's name and the artist/song information.
 
-With PixelRadio you can broadcast stereo music as well as send RadioText messages about your pixel light show. Such as hours of operation or details on how to donate to the hosting event's charity organization. Or use it to display the name of the songs you are currently playing. PixelRadio is flexible so you can do any combination of those things.
+With PixelRadio you can broadcast stereo music as well as send RadioText messages about your pixel light show.
+Such as hours of operation or details on how to donate to a hosted event's charity organization.
+Or use it to display the name of the songs you are currently playing.
+PixelRadio is flexible so you can do any combination of those things; the messages that are sent are up to you.
 
 ## IMPORTANT INFORMATION
 
@@ -70,6 +75,8 @@ Here is a brief summary of PixelRadio's features.
 * Optional high current output to control a 5V or 12V ON-AIR sign.
 
 * Three user configurable digital I/O pins allow On/Off control of other devices.
+
+* Mono or Stereo analog audio, 1-Vpp line input (3.5mm TRS stereo phone jack).
 
 
 ## SKILLS REQUIRED:

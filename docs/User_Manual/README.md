@@ -36,7 +36,7 @@ By default the mDNS based URL is http://pixelradio.local
 The first time you boot PixelRadio it won't know your WiFi credentials.
 So it's unable to connect to the local network as a traditional WiFi Station (STA) connection.
 But it has a backup plan for that event.
-After it fails to connect it will switch to Accss Point (AP) mode.
+After it fails to connect it will switch to Access Point (AP) mode.
 An Access Point works the same as a mobile hotspot.
 
 ### AP MODE INSTRUCTIONS
