@@ -3,7 +3,7 @@
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
    Version: 1.0
    Creation: Dec-16-2021
-   Revised:  Mar-12-2022
+   Revised:  Apr-06-2022
    Public Release:
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -22,7 +22,8 @@
 
    ESPUI NOTES:
    ============
-   NOTE 1. This project uses the PR#??? release of ESPUI Library, dated Mar-??-2022.
+   NOTE 1. This project uses iangray001's patched release of ESPUI Library created
+   on Feb-16-2022.
    I've found that the PR releases often introduce undesireable bugs. So I suggest
    staying with this release until there is a strong reason to try a newer version.
 
