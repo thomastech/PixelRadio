@@ -38,9 +38,12 @@ Normal audio content will be replaced by a pleasant tone sequence.
 The test tones can be used to help quickly identify your transmitter on a radio receiver.
 
 Test Tone mode also sends a RadioText message with runtime clock that is updated every five seconds.
-The RadioText is formatted as follows:
-
+The RadioText is formatted as follows:\
 `PIXELRADIO AUDIO TEST HH:MM:SS`
+
+When the Test Tone mode is enabled the front panel "Music On" LED will turn off.
+The LED will turn back on when the Test Tones are disabled;
+This indicates that the music source audio line input is active.
 
 ### AUDIO MUTE
 Audio can be silenced by moving the ``Audio Mute`` slide switch to the right side.
