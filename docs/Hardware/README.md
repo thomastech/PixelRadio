@@ -115,6 +115,24 @@ J8-1 SIG: LED Gnd (-)\
 J8-2 12V: LED 12V Power (+), max 1A\
 J8-3 5V: LED 5V Power (+), max 250mA
 
+### EXTERNAL WIFI ANTENNA
+The recommended enclosure is aluminum construction, which will shield the ESP32's antenna.
+This will reduce WiFi signal strength.
+Replacing the supplied metal end panels with PixelRadio's 3D Printed plastic parts will provide better WiFi range.
+
+For best WiFi performance the ESP32 can be updated to use an external 2.4GHz WiFi antenna.
+This will increase WiFi range and improve wireless network connectivity.
+The ESP32 has a u.FL (IPEX) connector for connecting the external antenna.
+Enabling it requires moving a 0402 size SMD resistor.
+
+The resistor is a 0-ohm jumper that normally connects the RF signal to the PCB mounted antenna.
+Moving the resistor disables the internal antenna and re-routes the RF signal to the U.FL connector.
+
+Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](http://https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
+The project's 3D Printed End Panel includes a mounting hole for installing the external antenna.
+
+>Note: The cable and antenna are sold in two variants, SMA and RP-SMA. Either can be used, but do NOT mix them; If the cable is SMA then the antenna must also be SMA.
+
 &nbsp;&nbsp;&nbsp;
 
 ---

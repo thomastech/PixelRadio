@@ -32,7 +32,10 @@ This will turn off the radio transmission (both audio and RDS).
 
 Typical use is to test the RadioText features without broadcasting a signal.
 A good radio operator only transmits when it is necessary.
-  
+
+>Note: The optional "On Air" sign is controlled by the RF Carrier switch.
+The sign will turn off when the RF carrier is disabled.
+
 ---
 
 ## MODULATION SETTINGS
