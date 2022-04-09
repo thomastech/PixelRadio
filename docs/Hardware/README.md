@@ -128,7 +128,7 @@ Enabling it requires moving a 0402 size SMD resistor.
 The resistor is a 0-ohm jumper that normally connects the RF signal to the PCB mounted antenna.
 Moving the resistor disables the internal antenna and re-routes the RF signal to the U.FL connector.
 
-Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](http://https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
+Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
 The project's 3D Printed End Panel includes a mounting hole for installing the external antenna.
 
 >Note: The cable and antenna are sold in two variants, SMA and RP-SMA. Either can be used, but do NOT mix them; If the cable is SMA then the antenna must also be SMA.
