@@ -143,14 +143,14 @@ YOU must accept all responsibility for the construction and use of the project.*
       <tr valign="top">
         <td align="right">4</td>
         <td align="left">L1, L2, L6, L8</td>
-        <td align="left">390nH</td>
-        <td align="left">RF Inductor, 100mA</td>
+        <td align="left">390nH (0.39uH)</td>
+        <td align="left">RF Inductor, 0.25W, >100mA</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>
         <td align="left">L5</td>
         <td align="left">10uH</td>
-        <td align="left">RF Inductor, 100mA</td>
+        <td align="left">RF Inductor, 0.25W, >100mA</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>
@@ -251,13 +251,13 @@ YOU must accept all responsibility for the construction and use of the project.*
       <tr valign="top">
         <td align="right">1</td>
         <td align="left">U2</td>
-        <td align="left">L7805CV-5.0</td>
+        <td align="left">L7805CV</td>
         <td align="left">5.0V 1A Voltage Regulator, TO-220</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>
         <td align="left">U3</td>
-        <td align="left">L7805CV-9.0</td>
+        <td align="left">L7809CV</td>
         <td align="left">9.0V 1A Voltage Regulator, TO-220</td>
       </tr>
       <tr valign="top">
@@ -284,7 +284,7 @@ AliExpress: https://www.aliexpress.com/item/4001045766243.html &nbsp;&nbsp;\
 
 ## PASSIVE COMPONENT INFO
 
-* **390nH Inductor, 0.25W, axial leads, 4 pcs** &nbsp;&nbsp;\
+* **390nH (0.39uH) Inductor, 0.25W, axial leads, 4 pcs** &nbsp;&nbsp;\
 AliExpress: https://www.aliexpress.com/item/32987240448.html &nbsp;&nbsp;
 
 * **10uH Inductor, 0.25W, axial leads** &nbsp;&nbsp;\
@@ -307,10 +307,10 @@ AliExpress: Multiple sources, do a search. &nbsp;&nbsp;
 * **CD4052 Analog Mux IC, 16-Pin DIP** &nbsp;&nbsp;\
 AliExpress: https://www.aliexpress.com/item/1005003112914510.html &nbsp;&nbsp;
 
-* **L7805CV-5.0, TO-220** &nbsp;&nbsp;\
+* **L7805CV, 5V Voltage Regulator, TO-220** &nbsp;&nbsp;\
 AliExpress: https://www.aliexpress.com/item/32842697093.html &nbsp;&nbsp;
 
-* **L7805CV-9.0, TO-220** &nbsp;&nbsp;\
+* **L7809CV, 9V Voltage Regulator, TO-220** &nbsp;&nbsp;\
 AliExpress: https://www.aliexpress.com/item/1005002917876030.html &nbsp;&nbsp;
 
 * **Green LED, 3mm** &nbsp;&nbsp;\
