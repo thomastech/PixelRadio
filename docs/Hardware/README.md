@@ -110,7 +110,7 @@ Set the ESP32's power switch to the ``ON`` position.
 The power switch is next to the ``RST`` push switch and the ON/OFF positions are labeled by its silkscreen text.
 To turn it ON simply slide the switch towards the ``RST`` push switch.
 
->>Important: The ESP32 will fail to boot if the Power Switch is in the ``OFF`` position.
+>Important: The ESP32 will fail to boot if the Power Switch is in the ``OFF`` position.
 
 ### ANTENNA
 
