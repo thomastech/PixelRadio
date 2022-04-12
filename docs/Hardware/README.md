@@ -98,6 +98,20 @@ However, using a socket at this location is not necessary.
 The QN8027 RF Module must be installed directly on the PCB.
 Do **NOT** use a socket to mount the RF module.
 
+### ESP32 INSTALLATION
+The LilyGo TTGO-T8 ESP32 MCU includes a 2-pin wire pigtail cable.
+Solder the cable to the P1 (VBAT) pads on the PCB;
+Red wire to the ``5V`` pad and Black wire to the ``GND`` pad.
+
+Plug the ESP32 into the PCB socket (orientation is shown in above photos).
+Plug the 2-Pin P1 cable into the ESP32.
+
+Set the ESP32's power switch to the ``ON`` position.
+The power switch is next to the ``RST`` push switch and the ON/OFF positions are labeled by its silkscreen text.
+To turn it ON simply slide the switch towards the ``RST`` push switch.
+
+>>Important: The ESP32 will fail to boot if the Power Switch is in the ``OFF`` position.
+
 ### ANTENNA
 
 The telescoping rod antenna looks nice and works well.
@@ -111,7 +125,7 @@ Assembly instructions are published at the doityourselfchristmas.com site:\
 ### ON AIR SIGN
 
 A 5V or 12V LED "On Air" indicator can be installed at J8, as follows:\
-J8-1 SIG: LED Gnd (-)\
+J8-1 SIG: LED GND (-)\
 J8-2 12V: LED 12V Power (+), max 1A\
 J8-3 5V: LED 5V Power (+), max 250mA
 
@@ -131,7 +145,9 @@ Moving the resistor disables the internal antenna and re-routes the RF signal to
 Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
 The project's 3D Printed End Panel includes a mounting hole for installing the external antenna.
 
->Note: The cable and antenna are sold in two variants, SMA and RP-SMA. Either can be used, but do NOT mix them; If the cable is SMA then the antenna must also be SMA.
+>Note: The cable and antenna are sold in two variants, SMA and RP-SMA.
+Either can be used, but do NOT mix them;
+If the cable is SMA then the antenna must also be SMA.
 
 &nbsp;&nbsp;&nbsp;
 
