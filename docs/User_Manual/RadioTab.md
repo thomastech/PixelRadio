@@ -40,7 +40,7 @@ The sign will turn off when the RF carrier is disabled.
 
 ## MODULATION SETTINGS
 
-The `MODULATIO SETTINGS` group is used to configure the FM signal's modulation characteristics.
+The `MODULATION SETTINGS` group is used to configure the FM signal's modulation characteristics.
 
 ### AUDIO MODE
 
