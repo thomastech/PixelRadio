@@ -43,7 +43,7 @@ Begin by launching PlatformIO and open the PixelRadio Folder.
 
 ### PLATFORMIO FILE EDITS
 1. Edit the `platformio_user.ini` file and change the COM Port numbers to match your TTGO ESP32 device.
-2. Rename the `credentials_user.h` file to `credentials.h` and add your WiFi settings.
+2. Make a duplicate of the `credentials_user.h` file. Rename the new file `credentials.h` and add your WiFi settings to it.
 3. Advanced users can edit `config.h` to alter the features; first time users should use the file as-is.
 
 ### PLATFORMIO UPLOAD
