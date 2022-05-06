@@ -54,13 +54,13 @@ YOU must accept all responsibility for the construction and use of the project.*
         <td align="right">7</td>
         <td align="left">C1, C4, C5, C11, C16, C17, C20</td>
         <td align="left">0.1uF 50V</td>
-        <td align="left">Monolithic Ceramic Capacitor</td>
+        <td align="left">Monolithic Ceramic (MLCC) Capacitor</td>
       </tr>
       <tr valign="top">
         <td align="right">3</td>
         <td align="left">C2, C15, C19</td>
         <td align="left">470uF 16V</td>
-        <td align="left">Electrolytic Capacitor</td>
+        <td align="left">Electrolytic Capacitor, Radial</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>
@@ -78,7 +78,7 @@ YOU must accept all responsibility for the construction and use of the project.*
         <td align="right">1</td>
         <td align="left">C10</td>
         <td align="left">0.01uF 50V</td>
-        <td align="left">Ceramic Capacitor</td>
+        <td align="left">Ceramic Disc or Mono Ceramic Capacitor</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>
@@ -90,7 +90,7 @@ YOU must accept all responsibility for the construction and use of the project.*
         <td align="right">2</td>
         <td align="left">C26, C33</td>
         <td align="left">1000pF 50V</td>
-        <td align="left">Ceramic Capacitor</td>
+        <td align="left">Ceramic Disc Capacitor, type C0G (NP0)</td>
       </tr>
       <tr valign="top">
         <td align="right">3</td>
@@ -102,7 +102,7 @@ YOU must accept all responsibility for the construction and use of the project.*
         <td align="right">3</td>
         <td align="left">C29, C32, C34</td>
         <td align="left">220pF 50V</td>
-        <td align="left">Ceramic Capacitor</td>
+        <td align="left">Ceramic Disc Capacitor, type C0G (NP0)</td>
       </tr>
       <tr valign="top">
         <td align="right">1</td>

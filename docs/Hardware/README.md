@@ -98,6 +98,12 @@ However, using a socket at this location is not necessary.
 The QN8027 RF Module must be installed directly on the PCB.
 Do **NOT** use a socket to mount the RF module.
 
+### FRONT PANEL LED
+
+The green LED (Music-On indicator) requires long leads to reach the front panel.
+Before soldering, temporarily position the enclosure's front panel and bend the LED's leads as needed.
+Then solder in place.
+
 ### ESP32 INSTALLATION
 The LilyGo TTGO-T8 ESP32 MCU includes a 2-pin wire pigtail cable.
 Solder the cable to the P1 (VBAT) pads on the PCB;
@@ -140,7 +146,7 @@ The ESP32 has a u.FL (IPEX) connector for connecting the external antenna.
 Enabling it requires moving a 0402 size SMD resistor.
 
 The resistor is a 0-ohm jumper that normally connects the RF signal to the PCB mounted antenna.
-Moving the resistor disables the internal antenna and re-routes the RF signal to the U.FL connector.
+Moving the resistor disables the internal antenna and re-routes the RF signal to the u.FL connector.
 
 Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
 The project's 3D Printed End Panel includes a mounting hole for installing the external antenna.
