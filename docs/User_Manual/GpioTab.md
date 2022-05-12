@@ -22,7 +22,8 @@ For example, use one of the GPIO pins to turn on a audio amplifier for your outd
 The `GPIO BOOT STATES` group is used to configure the three GPIO pin states at boot time.
 
 After boot, the GPIO pins are typically managed by the Serial, MQTT, or HTTP Controllers.
-However, for Local Control the boot state entries can also be changed during runtime.
+The command keywords used to control the GPIO pins are summarized on the [RDS Controllers page](Controllers.md#command-keywords).
+For Local Control the GPIO Tab's boot state entries can be changed during runtime.
 
 ### GPIO PIN 19
 
