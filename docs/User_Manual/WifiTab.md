@@ -21,6 +21,8 @@ The `WIFI` Tab is used to configure the WiFi and Networking features.
 
 The `WIFI STATUS` group reports Router signal strength and network connection mode.
 
+>Note: PixelRadio's WiFi is 2.4GHz only; It does NOT support 5GHz.
+
 ### RSSI
 
 The `RSSI` panel is the Received Signal Strength Indicator.

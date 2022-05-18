@@ -16,7 +16,7 @@ The target device is a LilyGO TTGO-T8 ESP32 microcontroller.
 <img style="padding-right: 10px; padding-bottom: 20px;" align="left" src="../docs/Images/platformioLogo1_175.png" width="75">
 
 Compiling the source code requires VSCode with the [PlatformIO IDE](https://platformio.org/platformio-ide) extension.
-Current release compiles on Platformio Core 5.2.5, Home 3.4.1.
+Current release compiles on PlatformIO Core 5.2.5, Home 3.4.1.
 
 The software is written in C and requires PlatformIO's Espressif32 board platform and Arduino framework.
 Current release was built using Espressif32 3.5.0.
@@ -49,7 +49,8 @@ Begin by launching PlatformIO and open the PixelRadio Folder.
 ### PLATFORMIO UPLOAD
 
 Select PlatformIO's Upload function.
-This will build the firmware and perform the Upload.
+It will appear in the `Project Tasks` menu after clicking the PlatformIO Icon (Ant Head) on the left side of the screen.
+Click the Upload function to build the firmware and perform the Upload.
 
 Initial Uploads may fail due to missing libraries.
 Simply repeat the Upload and the missing dependencies will be added to the project so it can be built.

@@ -14,6 +14,8 @@ That is to say, it is an IoT device.
 Don't worry, it uses your Local WiFi network and is not Cloud based.
 It purposely does not make any calls to the internet, everything is local.
 
+>Note: PixelRadio's WiFi is 2.4GHz only; It does NOT support 5GHz.
+
 Access is via desktop or mobile browsers. The chosen browser must support WebSocket communication;
 no problem for nearly any modern browser, but older versions will not work.
 
@@ -38,6 +40,8 @@ So it's unable to connect to the local network as a traditional WiFi Station (ST
 But it has a backup plan for that event.
 After it fails to connect it will switch to Access Point (AP) mode.
 An Access Point works the same as a mobile hotspot.
+
+>Note: PixelRadio's WiFi is 2.4GHz only; It does NOT support 5GHz.
 
 ### AP MODE INSTRUCTIONS
 When AP mode is active you should browse the available hotspots shown in your system's WiFi network list.\
