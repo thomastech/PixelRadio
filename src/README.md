@@ -48,15 +48,21 @@ Begin by launching PlatformIO and open the PixelRadio Folder.
 
 ### PLATFORMIO UPLOAD
 
-Select PlatformIO's Upload function.
+1. Disconnect PixelRadio's 12VDC power supply.\
+Using a USB cable, connect the TTGO ESP32 to your PC.\
+Remove the MicroSD Card (if installed) from the ESP32.
+
+>IMPORTANT: The MicroSD Card MUST be removed before flashing!
+
+2. Select PlatformIO's Upload function.
 It will appear in the `Project Tasks` menu after clicking the PlatformIO Icon (Ant Head) on the left side of the screen.
 Click the Upload function to build the firmware and perform the Upload.
 
-Initial Uploads may fail due to missing libraries.
+3. Initial Uploads may fail due to missing libraries.
 Simply repeat the Upload and the missing dependencies will be added to the project so it can be built.
 A successful build will automatically launch the file uploader and Flash the ESP32 device.
 
-After a successful Upload, execute PlatformIO's `Upload Filesystem Image` function.
+4. After a successful Upload, execute PlatformIO's `Upload Filesystem Image` function.
 This will Flash the data files needed by PixelRadio.
 
 
@@ -71,6 +77,8 @@ For other operating systems please do a web search for a ESP32 Flash Tool that i
 
 <img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../docs/Images/espressifLogo1_400.png" width="150">
 The Flashing Tool is available here: <a href="https://www.espressif.com/en/support/download/other-tools" target="_blank">DOWNLOAD FLASH TOOL</a>
+
+&nbsp;&nbsp;&nbsp;
 
 ### FLASH DOWNLOAD TOOL INSTRUCTIONS
 <img style="padding-right: 10px; padding-bottom: 20px;" align="right" src="../docs/Images/espFlashTool1_800.png" width="500">
@@ -101,22 +109,26 @@ Confirm the bin offsets are correctly entered, as follows:\
 5. Enable all the settings shown in the screenshot.\
 Important: The `COM` entry must match your ESP32's USB COM port.
 
-6. Using a USB cable, connect the TTGO ESP32 to your PC.
-Do not connect PixelRadio's 12VDC power supply.\
-Press Start (located at the lower left corner of Flashing Tool).\
+6. Disconnect PixelRadio's 12VDC power supply.\
+Using a USB cable, connect the TTGO ESP32 to your PC.\
+Remove the MicroSD Card (if installed) from the ESP32.
+
+>IMPORTANT: The MicroSD Card MUST be removed before flashing!
+
+7. Press Start (located at the lower left corner of Flashing Tool).\
 Flashing takes about a minute.
 If the upload fails then check your settings and try again.\
 Unplug the ESP32 after the upload is successful.
 
-7. One support file must be manually added using a microSD card.\
+8. One support file must be manually added using a microSD card.\
 The microSD Card (32GB or less) must be formatted as FAT32.\
 Copy the `RadioLogo225x75_base64.gif` file from the project data folder to the SD Card.\
 Do NOT rename the file.
 
-8. Insert the SD Card into the ESP32 and apply power.\
+9. Insert the SD Card into the ESP32 and apply power.\
 Wait one minute then remove the SD card.
 
-9. PixelRadio is now ready to use.
+10. PixelRadio is now ready to use.
 
 &nbsp;&nbsp;&nbsp;
 
