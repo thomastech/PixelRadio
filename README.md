@@ -36,7 +36,7 @@ Broadcast distance with a simple 76cm long wire aerial is about 100 meters (300 
 This is adequate for reaching drive-by visitors.
 
 >The low power is a best-effort attempt to satisfy the unlicensed RF regulations found in countries such as the USA.
->However, no claims are being made that it is complaint with any rules.
+>However, no claims are being made that it is compliant with any rules.
 >It is up to the operator to ensure that this RF device is operated in accordance with their government's regulations.
 
 Any component sources that are mentioned are for your convenience. Please feel free to use your favorite supplier to acquire parts.
@@ -102,7 +102,7 @@ Some programming experience will be needed if you intend to make improvements to
 <span>
 <img style="padding-right: 10px; padding-bottom: 20px;" align="left" src="./docs/Images/platformioLogo1_175.png" width="75">
 
-Compiling the source code requires VSCode with the [Platformio IDE](https://platformio.org/platformio-ide) extension.
+Compiling the source code requires VSCode with the [PlatformIO IDE](https://platformio.org/platformio-ide) extension.
 The software is written in C and requires PlatformIO's Espressif32 board platform and Arduino framework.
 </span>
 

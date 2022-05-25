@@ -212,7 +212,7 @@ The original LOG setting can be restored by sending this command:\
 
 ### SERIAL HELP
 
-When using a terminal emulator you can type "h" or "help" to see a summary of the Serial Controller's commands.
+When using a terminal emulator you can type `h` or `help` to see a summary of the Serial Controller's commands.
 
 &nbsp;&nbsp;&nbsp;
 
