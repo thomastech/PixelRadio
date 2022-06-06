@@ -37,7 +37,7 @@ PCB specifications are as follows:
 ``PCB Thickness: 1.2mm``\
 ``Base Material: FR-4`` \
 ``Layers: 2`` \
-``Dimension: 99.57 mm* 94.61 mm`` \
+``Dimension: 99.57mm X 94.61mm`` \
 ``Different Design: 1`` \
 ``Delivery Format: Single PCB``\
 ``Impedance: No``\
