@@ -95,8 +95,9 @@ The added height from the sockets will provide proper clearance to the mounting 
 The CD4052 IC (U1) can be installed in a 16-PIN DIP socket.
 However, using a socket at this location is not necessary.
 
-The QN8027 RF Module must be installed directly on the PCB.
-Do **NOT** use a socket to mount the RF module.
+The QN8027 RF Module must be installed directly on the PCB using the SIP Header pin strips included with the module.
+The header strips will provide a 2-3mm gap between the main PCB and the RF module.
+Do **NOT** use a plug-in socket to mount the RF module.
 
 ### FRONT PANEL LED
 
