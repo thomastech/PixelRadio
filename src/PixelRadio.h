@@ -80,6 +80,7 @@ const uint8_t CMD_TIME_MAX_SZ = 4;  // Time Command Arg length is 3 (5-900). Add
 #define  CMD_MUTE_STR        "mute"   // Radio Audio Mute, On/Off.
 #define  CMD_PERIOD_STR      "rtper"  // RadioText Display Time Period, in seconds.
 #define  CMD_PICODE_STR      "pic"    // RDS Program Information Code.
+#define  CMD_PTYCODE_STR     "pty"    // RDS PTY Code.
 #define  CMD_PSN_STR         "psn"    // RadioText Program Service Name, 8 chars max.
 #define  CMD_REBOOT_STR      "reboot" // Reboot System.
 #define  CMD_RADIOTEXT_STR   "rtm"    // RadioText Message, 64 chars max.
@@ -254,6 +255,9 @@ const uint32_t RDS_PI_CODE_MIN  = 0x00ff;         // Minumum PI Code Value (hex)
 const uint8_t  RDS_PSN_MAX_SZ   = CMD_PSN_MAX_SZ; // RDS Program Service Name, Max Allowed Length.
 const uint8_t  RDS_TEXT_MAX_SZ  = CMD_RT_MAX_SZ;  // RDS RadioText Message, Max Allowed Length.
 const uint8_t  RDS_REFRESH_TM   = 5;              // RadioText Refresh Time, in Seconds.
+const uint8_t  RDS_PTY_CODE_DEF  = 0xA;           // Default RDS PTY Code,  "Top 40"
+const uint8_t  RDS_PTY_CODE_MIN  = 0x0;           // Min RDS PTY Code,  "None"
+const uint8_t  RDS_PTY_CODE_MAX  = 29;            // Max RDS PTY Code,  "Weather"
 
 // RSSI:
 const uint16_t RSSI_UPD_TIME = 2500;              // RSSI GUI Update time (on homeTab), in mS.
@@ -351,6 +355,8 @@ bool    muteCmd(String  payloadStr,
                 uint8_t controller);
 bool    piCodeCmd(String  payloadStr,
                   uint8_t controller);
+bool    ptyCodeCmd(String  payloadStr,
+                   uint8_t controller);
 bool    programServiceNameCmd(String  payloadStr,
                               uint8_t Controller);
 bool    radioTextCmd(String  payloadStr,

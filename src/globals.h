@@ -70,6 +70,11 @@ extern uint16_t rdsMqttPiCode;
 extern uint16_t rdsHttpPiCode;
 extern uint16_t rdsSerialPiCode;
 
+extern uint8_t rdsLocalPTYCode;
+extern uint8_t rdsMqttPTYCode;
+extern uint8_t rdsHttpPTYCode;
+extern uint8_t rdsSerialPTYCode;
+
 extern uint32_t baudRate;
 extern int32_t rdsHttpMsgTime;
 extern int32_t rdsLocalMsgTime;

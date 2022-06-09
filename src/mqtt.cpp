@@ -170,6 +170,10 @@ static void mqttCallback(const char *topic, byte *payload, unsigned int length)
         Log.infoln("MQTT Received RDS PI Code Command");
         piCodeCmd(payloadStr, MQTT_CNTRL);
     }
+    else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_PTYCODE_STR)) {
+        Log.infoln("MQTT Received RDS PTY Code Command");
+        ptyCodeCmd(payloadStr, MQTT_CNTRL);
+    }
     else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_PSN_STR)) {
         Log.infoln("MQTT: Received RDS Program Station Name Command");
         programServiceNameCmd(payloadStr, MQTT_CNTRL);

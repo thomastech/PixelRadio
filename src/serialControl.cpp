@@ -216,6 +216,15 @@ void serialCommands(void)
             }
             serial_manager.println(printBuff);
         }
+        else if (cmdStr == CMD_PTYCODE_STR) {
+            if (ptyCodeCmd(paramStr, SERIAL_CNTRL)) {
+                sprintf(printBuff, "{\"%s\": \"ok\"}", CMD_PTYCODE_STR);
+            }
+            else {
+                sprintf(printBuff, "{\"%s\": \"fail\"}", CMD_PTYCODE_STR);
+            }
+            serial_manager.println(printBuff);
+        }
         else if (cmdStr == CMD_PSN_STR) {
             if (programServiceNameCmd(paramStr, SERIAL_CNTRL)) {
                 sprintf(printBuff, "{\"%s\": \"ok\"}", CMD_PSN_STR);

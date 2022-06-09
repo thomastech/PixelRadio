@@ -197,6 +197,7 @@ void processRDS(void) {
             rdsMillis         = currentMillis;
 
             radio.setPiCode(rdsSerialPiCode); // Set Serial Controller's Pi Code.
+            radio.setPTYCode(rdsSerialPTYCode); // Set Serial Controller's PTY Code.
 
             sprintf(logBuff, "Serial Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -221,6 +222,7 @@ void processRDS(void) {
             rdsMillis         = currentMillis;
 
             radio.setPiCode(rdsMqttPiCode); // Set MQTT Controller's Pi Code.
+            radio.setPTYCode(rdsMqttPTYCode); // Set MQTT Controller's PTY Code.
 
             sprintf(logBuff, "MQTT Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -243,6 +245,7 @@ void processRDS(void) {
             rdsMillis         = currentMillis;
 
             radio.setPiCode(rdsHttpPiCode); // Set HTTP Controller's Pi Code.
+            radio.setPTYCode(rdsHttpPTYCode); // Set HTTP Controller's PTY Code.
 
             sprintf(logBuff, "HTTP Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -310,6 +313,7 @@ void processRDS(void) {
         rdsRefreshPsnStr   = rdsLocalPsnStr;
 
         radio.setPiCode(rdsLocalPiCode); // Set Local Controller's Pi Code.
+        radio.setPTYCode(rdsLocalPTYCode); // Set Local Controller's PTY Code.
 
         sprintf(logBuff, "Local Controller Sending RDS Station Name (%s).", rdsLocalPsnStr.c_str());
         Log.infoln(logBuff);
@@ -402,6 +406,7 @@ void resetControllerRdsValues(void)
 {
     // Local RDS Controller
     radio.setPiCode(rdsLocalPiCode);    // Local RDS PI Code is Fixed Value.
+    radio.setPTYCode(rdsLocalPTYCode);  // Local RDS PTY Code is Fixed Value.
 
     // USB Serial RDS Controller. All values can be changed during runtime by Serial Commands.
     rdsSerialPsnStr  = rdsLocalPsnStr;  // Default Program Service Name (Mimic Local Controller).

@@ -316,6 +316,11 @@ void QN8027Radio::setPiCode(uint16_t piCodeVal){
 	piCode = piCodeVal;
 }
 
+// Change the PTY Code. Be sure to use a valid PTY Code.
+void QN8027Radio::setPTYCode(uint8_t ptyCodeVal){
+	ptyCode = ptyCodeVal;
+}
+
 /*
 ON  : RF power Amplifier will be off automatically after 60 second of no audio input at pin 6 and pin 7 (which is default)
 OFF : PA will never off. No effect of audio input silence.
@@ -538,6 +543,11 @@ uint16_t QN8027Radio::getPiCode(void){
 	return piCode;
 }
 
+// Read the PTY Code.
+uint8_t QN8027Radio::getPTYCode(void){
+	return ptyCode;
+}
+
 //-------------------RDS sending---------------------------------------------------------------
 /*
 Sends Program Service Name (PSN = Station ID) such as "KZAP FM" to a RDS enabled receiver.
@@ -561,7 +571,9 @@ void QN8027Radio::sendStationName(String SN){
 
 	for(int i=0;i<rds_len;i+=2){
         if(i>=PSN_SIZE) break; // Prevent RDS buffer overflow. Mod By TEB, Jan-31-2022.
-		sendRDS(highByte(piCode),lowByte(piCode),0x02,0x68+(i/2),0xE0,0xCD,char_array[i],char_array[i+1]);
+        uint8_t ptyHi = (ptyCode & 0x18) >> 3; //top 2 bits of PTY are in bottom 2 bits of byte 3
+        uint8_t ptyLo = (ptyCode << 5) & 0xE0; //bottom 3 bits of PTY are in top 3 bits of byte 4
+		sendRDS(highByte(piCode),lowByte(piCode),ptyHi, ptyLo | (0x08+(i/2)),0xE0,0xCD,char_array[i],char_array[i+1]);
 		waitForRDSSend();
 	}
 }
@@ -604,7 +616,9 @@ void QN8027Radio::sendRadioText(String RT){
 
 	for (int i=0;i<rds_len;i+=4){
         if (i >= RADIOTEXT_SIZE) break; // Prevent RDS buffer overflow. Mod By TEB, Jan-31-2022.
-		sendRDS(highByte(piCode),lowByte(piCode),0x22,0x60+(i/4),char_array[i],char_array[i+1],char_array[i+2],char_array[i+3]);
+        uint8_t ptyHi = (ptyCode & 0x18) >> 3; //top 2 bits of PTY are in bottom 2 bits of byte 3
+        uint8_t ptyLo = (ptyCode << 5) & 0xE0; //bottom 3 bits of PTY are in top 3 bits of byte 4
+		sendRDS(highByte(piCode),lowByte(piCode),0x20 | ptyHi,ptyLo | (i/4),char_array[i],char_array[i+1],char_array[i+2],char_array[i+3]);
 		waitForRDSSend();
 	}
 }

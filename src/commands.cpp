@@ -495,6 +495,59 @@ bool piCodeCmd(String payloadStr, uint8_t controller)
     }
     return true;
 }
+// *************************************************************************************************************************
+bool ptyCodeCmd(String payloadStr, uint8_t controller)
+{
+    char logBuff[80];
+    const  uint8_t maxSize = CMD_PI_MAX_SZ;
+    uint32_t tempPTYCode;
+    String   controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> ptyCodeCmd: Undefined Controller!");
+        return false;
+    }
+
+    payloadStr.trim();
+
+    if (payloadStr.length() > maxSize) {
+        payloadStr = payloadStr.substring(0, maxSize);
+    }
+
+    tempPTYCode = strtol(payloadStr.c_str(), NULL, HEX);
+
+    if ((tempPTYCode < RDS_PTY_CODE_MIN) || (tempPTYCode > RDS_PTY_CODE_MAX)) {
+        sprintf(logBuff, "-> %s Controller: Invalid RDS PTY Code Value, Ignored.", controllerStr.c_str());
+        Log.errorln(logBuff);
+        return false;
+    }
+    else {
+        if (radio.getPTYCode() != (uint16_t)(tempPTYCode)) { // New PTY Code.
+            if (controller == SERIAL_CNTRL) {
+                rdsSerialPTYCode = tempPTYCode;
+                textSerialFlg   = true;                    // Reload Serial RDS values
+            }
+            else if (controller == MQTT_CNTRL) {
+                rdsMqttPTYCode = tempPTYCode;
+                textMqttFlg   = true; // Reload MQTT RDS values
+            }
+            else if (controller == HTTP_CNTRL) {
+                rdsHttpPTYCode = tempPTYCode;
+                textHttpFlg   = true; // Reload HTTP RDS values
+            }
+
+            displaySaveWarning();
+            sprintf(logBuff, "-> %s Controller: PTY Code Set to 0x%04X.", controllerStr.c_str(), tempPTYCode);
+        }
+        else {
+            sprintf(logBuff, "-> %s Controller: PTY Code Unchanged (0x%04X).", controllerStr.c_str(), tempPTYCode);
+        }
+        Log.verboseln(logBuff);
+    }
+    return true;
+}
 
 // *************************************************************************************************************************
 bool programServiceNameCmd(String payloadStr, uint8_t controller)

@@ -484,7 +484,30 @@ void processWebClient(void)
                             }
                             client.println(HTML_CLOSE_STR);
                         }
+                        // ************* PTY CODE COMMAND ****************
+                        else if (requestLcStr.indexOf(makeHttpCmdStr(CMD_PTYCODE_STR)) >= 0) {
+                            Log.infoln("-> HTTP CMD: PTY CODE");
 
+                            if (getCommandArg(requestStr, CMD_PI_MAX_SZ) == -1) {
+                                successFlg = false;
+                                Log.errorln("-> HTTP CMD: PTY Code Missing Value (abort).");
+                            }
+                            else {
+                                if (ptyCodeCmd(requestStr, HTTP_CNTRL) == false) {
+                                    successFlg = false;
+                                }
+                            }
+                            client.print(HTML_HEADER_STR);
+                            client.print(HTML_DOCTYPE_STR);
+
+                            if (successFlg) {
+                                client.printf("{\"%s\": \"ok\"}\r\n", CMD_PTYCODE_STR);
+                            }
+                            else {
+                                client.printf("{\"%s\": \"fail\"}\r\n", CMD_PTYCODE_STR);
+                            }
+                            client.println(HTML_CLOSE_STR);
+                        }
                         // ********PROGRAM SERVICE NAME COMMAND *********
                         else if (requestLcStr.indexOf(makeHttpCmdStr(CMD_PSN_STR)) >= 0) {
                             Log.infoln("-> HTTP CMD: PSN (Program Service Name)");

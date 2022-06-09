@@ -90,6 +90,10 @@ uint16_t rdsSerialPiCode = RDS_PI_CODE_DEF; // Serial Controller PI Code, can be
 uint16_t rdsMqttPiCode   = RDS_PI_CODE_DEF; // MQTT Controller PI Code, can be changed by MQTT Command.
 uint16_t rdsHttpPiCode   = RDS_PI_CODE_DEF; // HTTP Controller PI Code, can be changed by HTTP Command.
 
+uint8_t rdsMqttPTYCode   = RDS_PTY_CODE_DEF;// MQTT Controller PTY Code, can be changed by MQTT Command.
+uint8_t rdsHttpPTYCode   = RDS_PTY_CODE_DEF;// HTTP Controller PTY Code, can be changed by HTTP Command.
+uint8_t rdsSerialPTYCode = RDS_PTY_CODE_DEF;// Serial Controller PTY Code, can be changed by Serial Command.
+
 int32_t rdsHttpMsgTime   = RDS_DSP_TM_DEF;  // HTTP Controller's Message Time Can be Changed by HTTP Command.
 int32_t rdsMqttMsgTime   = RDS_DSP_TM_DEF;  // MQTT Controller's Message Time Can be Changed by MQTT Command.
 int32_t rdsSerialMsgTime = RDS_DSP_TM_DEF;  // Serial Controller's Message Time Can be Changed by Serial Command.
@@ -139,6 +143,7 @@ uint8_t usbVol    = (atoi(USB_VOL_DEF_STR));               // Control.
 uint8_t analogVol = (atoi(ANA_VOL_DEF_STR));               // Control.
 
 uint16_t rdsLocalPiCode = RDS_PI_CODE_DEF;                 // Local Controller PI Code, Fixed value.
+uint16_t rdsLocalPTYCode = RDS_PTY_CODE_DEF;                // Local Controller PI Code, Fixed value.
 
 int32_t rdsLocalMsgTime = RDS_DSP_TM_DEF;                  // Control.
 

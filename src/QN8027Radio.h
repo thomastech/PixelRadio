@@ -62,6 +62,7 @@ public:
   uint8_t monoAudio = 0;			//16==mono , 0=Stereo
   uint8_t muteAudio = 0; 			//8==mute ON, 0==mute OFF
   uint16_t piCode  = RDS_PI_CODE_DEF;
+  uint8_t  ptyCode = 0xA;           // "Top 40"
 
   //XPLT
   uint8_t preEmphTime = 128; 		//128==75uS, 0==50uS
@@ -120,6 +121,7 @@ public:
   uint8_t getAudioInpPeak();
   uint8_t getStatus();
   uint16_t getPiCode(void);
+  uint8_t getPTYCode();
 
   void updateSYSTEM_REG();
   void updateGPLT_REG();
@@ -142,6 +144,7 @@ public:
   void setTxPilotFreqDeviation(uint8_t PGain);
   void setTxFreqDeviation(uint8_t Fdev);
   void setPiCode(uint16_t piCodeVal);
+  void setPTYCode(uint8_t ptyCodeVal);
 
   void RDS(uint8_t onOffCtrl);
   void setRDSFreqDeviation(uint8_t RDSFreqDev);
