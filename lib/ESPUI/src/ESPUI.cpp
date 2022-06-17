@@ -1,3 +1,4 @@
+// ESPUI.cpp: Modified for ESP32 LittleFS, TEB Jun-13-2022
 #include "ESPUI.h"
 
 #include <functional>
@@ -27,7 +28,7 @@ void listDir(const char* dirname, uint8_t levels)
 #endif
 
 #if defined(ESP32)
-    File root = LITTLEFS.open(dirname);
+    File root = LittleFS.open(dirname);
 #else
     File root = LittleFS.open(dirname);
 #endif
@@ -115,9 +116,9 @@ void listDir(const char* dirname, uint8_t levels)
 void ESPUIClass::list()
 {
 #if defined(ESP32)
-    if (!LITTLEFS.begin())
+    if (!LittleFS.begin())
     {
-        Serial.println(F("LITTLEFS Mount Failed"));
+        Serial.println(F("LittleFS Mount Failed"));
         return;
     }
 #else
@@ -131,8 +132,8 @@ void ESPUIClass::list()
     listDir("/", 1);
 #if defined(ESP32)
 
-    Serial.println(LITTLEFS.totalBytes());
-    Serial.println(LITTLEFS.usedBytes());
+    Serial.println(LittleFS.totalBytes());
+    Serial.println(LittleFS.usedBytes());
 
 #else
     FSInfo fs_info;
@@ -147,7 +148,7 @@ void ESPUIClass::list()
 void deleteFile(const char* path)
 {
 #if defined(ESP32)
-    bool exists = LITTLEFS.exists(path);
+    bool exists = LittleFS.exists(path);
 #else
     bool exists = LittleFS.exists(path);
 #endif
@@ -172,7 +173,7 @@ void deleteFile(const char* path)
 #endif
 
 #if defined(ESP32)
-    bool didRemove = LITTLEFS.remove(path);
+    bool didRemove = LittleFS.remove(path);
 #else
     bool didRemove = LittleFS.remove(path);
 #endif
@@ -206,7 +207,7 @@ void writeFile(const char* path, const char* data)
 #endif
 
 #if defined(ESP32)
-    File file = LITTLEFS.open(path, FILE_WRITE);
+    File file = LittleFS.open(path, FILE_WRITE);
 #else
     File file = LittleFS.open(path, FILE_WRITE);
 #endif
@@ -283,14 +284,14 @@ void ESPUIClass::prepareFileSystem()
 #endif
 
 #if defined(ESP32)
-    LITTLEFS.format();
+    LittleFS.format();
 
-    if (!LITTLEFS.begin(true))
+    if (!LittleFS.begin(true))
     {
 #if defined(DEBUG_ESPUI)
         if (this->verbosity)
         {
-            Serial.println(F("LITTLEFS Mount Failed"));
+            Serial.println(F("LittleFS Mount Failed"));
         }
 #endif
 
@@ -301,7 +302,7 @@ void ESPUIClass::prepareFileSystem()
     if (this->verbosity)
     {
         listDir("/", 1);
-        Serial.println(F("LITTLEFS Mount ESP32 Done"));
+        Serial.println(F("LittleFS Mount ESP32 Done"));
     }
 #endif
 
@@ -312,7 +313,7 @@ void ESPUIClass::prepareFileSystem()
 #if defined(DEBUG_ESPUI)
     if (this->verbosity)
     {
-        Serial.println(F("LITTLEFS Mount ESP8266 Done"));
+        Serial.println(F("LittleFS Mount ESP8266 Done"));
     }
 #endif
 
@@ -368,7 +369,7 @@ void ESPUIClass::prepareFileSystem()
 #endif
 
 #if defined(ESP32)
-    LITTLEFS.end();
+    LittleFS.end();
 #else
     LittleFS.end();
 #endif
@@ -446,7 +447,7 @@ void onWsEvent(
         {
             int idx = msg.substring(msg.indexOf(':') + 1).toInt();
             ESPUI.jsonDom(idx, client);
-        } else 
+        } else
         {
             uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
 
@@ -975,7 +976,7 @@ void ESPUIClass::updateGauge(uint16_t id, int number, int clientId)
     updateControlValue(id, String(number), clientId);
 }
 
-void ESPUIClass::updateTime(uint16_t id, int clientId) 
+void ESPUIClass::updateTime(uint16_t id, int clientId)
 {
     updateControl(id, clientId);
 }
@@ -1040,15 +1041,15 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 }
 
 /*
-Convert & Transfer Arduino elements to JSON elements. This function sends a chunk of 
+Convert & Transfer Arduino elements to JSON elements. This function sends a chunk of
 JSON describing the controls of the UI, starting from the control at index startidx.
 If startidx is 0 then a UI_INITIAL_GUI message will be sent, else a UI_EXTEND_GUI.
 Both message types contain a list of serialised UI elements. Only a portion of the UI
-will be sent in order to avoid websocket buffer overflows. The client will acknowledge 
+will be sent in order to avoid websocket buffer overflows. The client will acknowledge
 receipt of a partial message by requesting the next chunk of UI.
 
 The protocol is:
-SERVER: jsonDom(0): 
+SERVER: jsonDom(0):
     "UI_INITIAL_GUI: n serialised UI elements"
 CLIENT: controls.js:handleEvent()
     "uiok:n"
@@ -1056,7 +1057,7 @@ SERVER: jsonDom(n):
     "UI_EXTEND_GUI: n serialised UI elements"
 CLIENT: controls.js:handleEvent()
     "uiok:2*n"
-etc. 
+etc.
 */
 void ESPUIClass::jsonDom(uint16_t startidx, AsyncWebSocketClient* client)
 {
@@ -1098,7 +1099,7 @@ will acknoledge receipt by requesting the next chunk. */
 void ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startindex, JsonArray* items)
 {
     //First check that there will be sufficient nodes in the list
-    if(startindex >= this->controlCount) 
+    if(startindex >= this->controlCount)
     {
         return;
     }
@@ -1200,7 +1201,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     ws = new AsyncWebSocket("/ws");
 
 #if defined(ESP32)
-    bool fsBegin = LITTLEFS.begin();
+    bool fsBegin = LittleFS.begin();
 #else
     bool fsBegin = LittleFS.begin();
 #endif
@@ -1209,7 +1210,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
-            Serial.println(F("LITTLEFS Mount Failed, PLEASE CHECK THE README ON HOW TO "
+            Serial.println(F("LittleFS Mount Failed, PLEASE CHECK THE README ON HOW TO "
                              "PREPARE YOUR ESP!!!!!!!"));
         }
 #endif
@@ -1225,7 +1226,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
 #endif
 
 #if defined(ESP32)
-    bool indexExists = LITTLEFS.exists("/index.htm");
+    bool indexExists = LittleFS.exists("/index.htm");
 #else
     bool indexExists = LittleFS.exists("/index.htm");
 #endif
@@ -1252,7 +1253,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
             ws->setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
         }
 #if defined(ESP32)
-        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
+        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
 #endif
@@ -1260,7 +1261,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     else
     {
 #if defined(ESP32)
-        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm");
+        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
 #endif
@@ -1273,7 +1274,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
             return request->requestAuthentication();
         }
 
-        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In LITTLEFS mode");
+        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In LittleFS mode");
     });
 
     server->onNotFound([](AsyncWebServerRequest* request) { request->send(404); });

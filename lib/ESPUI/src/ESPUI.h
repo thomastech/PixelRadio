@@ -1,3 +1,4 @@
+// ESPUI.cpp: Modified for ESP32 LittleFS, TEB Jun-13-2022
 #ifndef ESPUI_h
 #define ESPUI_h
 
@@ -11,7 +12,7 @@
 #if defined(ESP32)
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 
 #include "WiFi.h"
 

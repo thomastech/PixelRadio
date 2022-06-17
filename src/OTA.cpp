@@ -1,12 +1,12 @@
 /*
    File: OTA.cpp
    Project: RBDS/RDS FM Transmitter (QN8027)
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-24-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -24,7 +24,7 @@
 #include <ArduinoLog.h>
 #include <WiFi.h>
 #include <ArduinoOTA.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include "config.h"
 #include "PixelRadio.h"
 #include "globals.h"
@@ -64,7 +64,7 @@ void otaInit(void)
         Log.infoln(" -> Set WiFi RF Power to Maximum.");
 
         if (updateLittleFS == true) {
-            LITTLEFS.end(); // Important, Must Unmount LITTLEFS!
+            LittleFS.end(); // Important, Must Unmount LITTLEFS!
             Log.infoln(" -> Unmounted LITTLEFS.");
         }
     })

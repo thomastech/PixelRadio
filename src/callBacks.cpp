@@ -1,13 +1,12 @@
 /*
    File: callBacks.cpp (ESPUI Web Page Callback Functions)
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-12-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -351,8 +350,8 @@ void controllerCallback(Control *sender, int type)
 void diagBootCallback(Control *sender, int type)
 {
     char logBuff[60];
-    long currentMillis    = millis(); // Snapshot of System Timer.
-    static long oldMillis = 0;
+    uint32_t currentMillis    = millis(); // Snapshot of System Timer.
+    static uint32_t oldMillis = 0;
 
     // sprintf(logBuff, "diagBootCallback ID: %d, Value: %s", sender->id, sender->value.c_str());
     // Log.verboseln(logBuff);
@@ -818,7 +817,7 @@ void rdsDisplayTimeCallback(Control *sender, int type)
     }
     displaySaveWarning();
     Log.infoln("Local RDS Message Time Set to: %u.", timerVal);
-    rdsLocalMsgTime = long(timerVal) * 1000; // Convert Secs to mSecs.
+    rdsLocalMsgTime = ((uint32_t)(timerVal)) * 1000; // Convert Secs to mSecs.
 }
 
 // ************************************************************************************************
@@ -938,9 +937,16 @@ void rdsRstCallback(Control *sender, int type)
         ESPUI.print(rdsEnb2ID,     "1");
         ESPUI.print(rdsEnb3ID,     "1");
 
+        rdsLocalMsgTime = RDS_DSP_TM_DEF;
+        rdsLocalPiCode  = RDS_PI_CODE_DEF;
+        rdsLocalPtyCode = RDS_PTY_CODE_DEF;
+        updateUiLocalMsgTime();
+        updateUiLocalPiCode();
+        updateUiLocalPtyCode();
+
         tempStr = String(RDS_DSP_TM_DEF / 1000);
-        ESPUI.print(rdsDspTmID,    tempStr);
-        ESPUI.print(rdsRstID,      "RESET!");
+        ESPUI.print(rdsDspTmID, tempStr);
+        ESPUI.print(rdsRstID,   "RESET!");
         displaySaveWarning();
 
         Log.infoln("RDS Settings Have Been Reset to Default Values.");
@@ -1034,8 +1040,10 @@ void rdsTextCallback(Control *sender, int type)
 
 // ************************************************************************************************
 // rfAutoOff(): Control Sound Activated RF Carrier Shutdown Feature. Sets Boolean.
-void rfAutoCallback(Control *sender, int type)
-{
+
+/*
+   void rfAutoCallback(Control *sender, int type)
+   {
     char logBuff[70];
 
     // sprintf(logBuff, "rdAutoCallback ID: %d, Value: %s", sender->id, sender->value.c_str());
@@ -1064,7 +1072,8 @@ void rfAutoCallback(Control *sender, int type)
         sprintf(logBuff, "rfAutoOff: %s.", BAD_SENDER_STR);
         Log.errorln(logBuff);
     }
-}
+   }
+ */
 
 // ************************************************************************************************
 // rfCarrierCallback(): Controls RF Carrier, On/Off.
@@ -1090,7 +1099,7 @@ void rfCarrierCallback(Control *sender, int type)
                   tempStr = "On, Warning: Radio Module RF-Out has High VSWR";
                   ESPUI.print(homeOnAirID, RADIO_VSWR_STR); // Update homeTab panel.
               }
-              else if (paVolts < PA_VOLT_MIN || paVolts > PA_VOLT_MAX) {
+              else if ((paVolts < PA_VOLT_MIN) || (paVolts > PA_VOLT_MAX)) {
                   Log.errorln("rfCarrierCallback: RF PA HAS INCORRECT VOLTAGE!");
                   tempStr = "On, Warning: RF PA has Incorrect Voltage";
                   ESPUI.print(homeOnAirID, RADIO_VOLT_STR); // Update homeTab panel.
@@ -1506,6 +1515,48 @@ void setPiCodeCallback(Control *sender, int type)
 }
 
 // ************************************************************************************************
+
+void setPtyCodeCallback(Control *sender, int type)
+{
+    char logBuff[50];
+    char ptyBuff[10];
+    int16_t tempPtyCode = 0;
+    String  ptyStr;
+
+    ptyStr.reserve(10);
+
+    // sprintf(logBuff, "setPtyCodeCallback ID: %d, Value: %s", sender->id, sender->value.c_str());
+    // Log.verboseln(logBuff);
+
+    if (sender->id == rdsPtyID) {
+        ptyStr = sender->value;
+        ptyStr.trim();
+        tempPtyCode = ptyStr.toInt();
+
+        if ((tempPtyCode < RDS_PTY_CODE_MIN) ||
+            (tempPtyCode > RDS_PTY_CODE_MAX) ||
+            (ptyStr.length() == 0)) {
+            tempPtyCode = rdsLocalPtyCode; // Error, Use old value.
+            sprintf(ptyBuff, "%0u", rdsLocalPtyCode);
+            ESPUI.print(rdsPtyID, ptyBuff);
+            sprintf(logBuff, "setPtyCodeCallback: %s.", BAD_VALUE_STR);
+            Log.errorln(logBuff);
+            return;
+        }
+
+        rdsLocalPtyCode = tempPtyCode;
+        displaySaveWarning();
+
+        sprintf(logBuff, "RDS PTY Code Set to: %u", rdsLocalPtyCode);
+        Log.infoln(logBuff);
+    }
+    else {
+        sprintf(logBuff, "setPtyCodeCallback: %s.", BAD_SENDER_STR);
+        Log.errorln(logBuff);
+    }
+}
+
+// ************************************************************************************************
 // setWiFiAddrsCallback(): Update WiFi Static IP and subnet (for Static IP). Also update AP (Hotspot) IP address.
 void setWiFiAddrsCallback(Control *sender, int type)
 {
@@ -1831,8 +1882,10 @@ void testModeCallback(Control *sender, int type)
 
 // ************************************************************************************************
 // volAdjustCallback(): Adjust USB or Analog Volume. Sets Int8_t.
-void volAdjustCallback(Control *sender, int type)
-{
+
+/*
+   void volAdjustCallback(Control *sender, int type)
+   {
     char logBuff[60];
     int16_t limitLo, limitHi;
 
@@ -1871,4 +1924,5 @@ void volAdjustCallback(Control *sender, int type)
         sprintf(logBuff, "volAdjustCallback: %s.", BAD_SENDER_STR);
         Log.errorln(logBuff);
     }
-}
+   }
+ */

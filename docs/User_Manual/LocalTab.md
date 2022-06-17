@@ -87,6 +87,17 @@ If you are interested in changing it then be sure to avoid using one that is alr
 For example, USA installations can consult online information like this one:
 <a href="https://picodes.nrscstandards.org/fs_pi_codes_allocated.html" target="_blank">NRSC PI Codes</a>
 
+### PTY CODE
+
+The `PTY CODE` panel is used to enter the _Program Type_ for your FM station.
+It identifies a particular type of broadcast (Rock, Jazz, Sports, Talk, News, Classical, etc.)
+The default setting is 9, which is the code used by Top-40 music stations.
+
+There are several different codes available for your use.
+The acceptable values range from 0 to 29 but be aware that some are unassigned.\
+They are summarized here:
+<a href="https://www.fmsystems-inc.com/rbds-rds-pty-codes-program-types" target="_blank">RDS PTY Codes</a>
+
 ---
 
 ## RESET RDS SETTINGS

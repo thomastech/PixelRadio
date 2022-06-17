@@ -1,13 +1,12 @@
 /*
    File: webGUI.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-11-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this
    license absolutely no warranty is given.
@@ -114,6 +113,7 @@ extern uint16_t rdsEnb1ID;
 extern uint16_t rdsEnb2ID;
 extern uint16_t rdsEnb3ID;
 extern uint16_t rdsPiID;
+extern uint16_t rdsPtyID;
 extern uint16_t rdsPiMsgID;
 extern uint16_t rdsProgNameID;
 extern uint16_t rdsSaveID;
@@ -152,5 +152,3 @@ extern uint16_t wifiStaMsgID;
 extern uint16_t wifiStaNameID;
 extern uint16_t wifiSubID;
 extern uint16_t wifiWpaKeyID;
-
-void adjFmFreqCallback(Control *sender, int type);

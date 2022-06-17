@@ -1,13 +1,12 @@
 /*
    File: mqtt.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-05-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -170,12 +169,20 @@ static void mqttCallback(const char *topic, byte *payload, unsigned int length)
         Log.infoln("MQTT Received RDS PI Code Command");
         piCodeCmd(payloadStr, MQTT_CNTRL);
     }
+    else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_PTYCODE_STR)) {
+        Log.infoln("MQTT Received RDS PTY Code Command");
+        ptyCodeCmd(payloadStr, MQTT_CNTRL);
+    }
     else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_PSN_STR)) {
         Log.infoln("MQTT: Received RDS Program Station Name Command");
         programServiceNameCmd(payloadStr, MQTT_CNTRL);
     }
     else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_RADIOTEXT_STR)) {
         Log.infoln("MQTT: Received RadioText Command");
+        radioTextCmd(payloadStr, MQTT_CNTRL);
+    }
+    else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_RF_CARRIER_STR)) {
+        Log.infoln("MQTT: Received RF Carrier Control Command");
         radioTextCmd(payloadStr, MQTT_CNTRL);
     }
     else if (topicStr == mqttNameStr + makeMqttCmdStr(CMD_REBOOT_STR)) {
@@ -264,8 +271,8 @@ void mqttInit(void) {
 void mqttReconnect(bool resetFlg)
 {
     char logBuff[120];
-    static uint8_t mqttRetryCount     = 0;        // MQTT Connection Retry Counter. Each reconnect attempt is allowed several tries.
-    static long    previousWiFiMillis = millis(); // Timer for WiFi services.
+    static uint8_t  mqttRetryCount     = 0;        // MQTT Connection Retry Counter. Each reconnect attempt is allowed several tries.
+    static uint32_t previousWiFiMillis = millis(); // Timer for WiFi services.
     char   payloadBuff[40];
     String topicStr;
 
@@ -358,9 +365,9 @@ void mqttSendMessages(void)
     static bool refresh = true;
     char logBuff[120];
     char payloadBuff[35];
-    static long  previousMqttMillis = millis(); // Timer for MQTT services.
-    static float oldVbatVolts       = -1.0f;
-    static float oldPaVolts         = -1.0f;
+    static uint32_t previousMqttMillis = millis(); // Timer for MQTT services.
+    static float    oldVbatVolts       = -1.0f;
+    static float    oldPaVolts         = -1.0f;
     String topicStr;
 
     if (!ctrlMqttFlg) { // MQTT Controller Disabled.

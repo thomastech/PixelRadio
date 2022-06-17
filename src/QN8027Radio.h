@@ -4,7 +4,8 @@ Written By ManojBhakarPCM with little help of other's code copy paste
 This file has been modified by TEB for use with the PixelRadio Project.
 The original QN8027 Arduino Library is incompatible, but can be downloaded from:
 https://github.com/ManojBhakarPCM/Arduino-QN8027-with-Full-RDS-support
-Edits by TEB, Feb-03-2022
+Edits by TEB (thomastech), Feb-03-2022
+Edits by TEB (thomastech) and dkulp, Jun-13-2022
 */
 
 #include <Wire.h>
@@ -40,13 +41,18 @@ Edits by TEB, Feb-03-2022
 #define     	ANT_REG               0x1E
 
 
-
 //indicate self definition
 #define 		ON				  	  0x01
 #define			OFF				  	  0x00
 #define 		CH0_MASK			  0x03
 #define 		POWER_MAX			  75
 #define			POWER_MIN			  20
+
+/*
+These values are provided in pixelradio.h
+#define         RDS_PI_CODE_DEF       0x6400
+#define         RDS_PTY_CODE_DEF      9
+*/
 
 
 class QN8027Radio
@@ -61,7 +67,8 @@ public:
   uint8_t rdsReady = 0;				//Toggle between 4 And 0
   uint8_t monoAudio = 0;			//16==mono , 0=Stereo
   uint8_t muteAudio = 0; 			//8==mute ON, 0==mute OFF
-  uint16_t piCode  = RDS_PI_CODE_DEF;
+  uint8_t ptyCode = RDS_PTY_CODE_DEF; // TEB, Jun-13-2022
+  uint16_t piCode = RDS_PI_CODE_DEF;  // TEB, MAR-07-2022
 
   //XPLT
   uint8_t preEmphTime = 128; 		//128==75uS, 0==50uS
@@ -93,8 +100,6 @@ public:
   uint8_t rdsSentStatus = 0;		//Toggle between 8 and 0 when RDS is sent successfully.
 
 
-
-
   QN8027Radio();
   QN8027Radio(int address);
   void write1Byte(uint8_t regAddr,uint8_t comData);
@@ -112,7 +117,6 @@ public:
   void sendRadioText(String RT);
   void waitForRDSSend();
 
-
   float getFrequency();
   uint8_t read1Byte(uint8_t regAddr);
   uint8_t canRDSbeSent();
@@ -120,6 +124,7 @@ public:
   uint8_t getAudioInpPeak();
   uint8_t getStatus();
   uint16_t getPiCode(void);
+  uint8_t getPTYCode(void); // dkulp, Jun-13-2022
 
   void updateSYSTEM_REG();
   void updateGPLT_REG();
@@ -131,7 +136,6 @@ public:
   void setTxDigitalGain(uint8_t DGain);
   void setAudioInpImp(uint8_t impdInKOhms);
 
-
   void setClockSource(uint8_t Type);
   void setCrystalCurrent(float percentOfMax);
 
@@ -142,11 +146,11 @@ public:
   void setTxPilotFreqDeviation(uint8_t PGain);
   void setTxFreqDeviation(uint8_t Fdev);
   void setPiCode(uint16_t piCodeVal);
+  void setPtyCode(uint8_t ptyCodeVal);  // dkulp, Jun-13-2022
 
   void RDS(uint8_t onOffCtrl);
   void setRDSFreqDeviation(uint8_t RDSFreqDev);
 
 };
-
 
 #endif

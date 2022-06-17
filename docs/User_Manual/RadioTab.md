@@ -33,8 +33,12 @@ This will turn off the radio transmission (both audio and RDS).
 Typical use is to test the RadioText features without broadcasting a signal.
 A good radio operator only transmits when it is necessary.
 
->Note: The optional "On Air" sign is controlled by the RF Carrier switch.
+>Note: The optional "On Air" sign is controlled by the state of the RF Carrier.
 The sign will turn off when the RF carrier is disabled.
+
+The other Controllers can also enable / disable the RF Carrier.
+The RF Carrier Control action is provided by the _rfc_ command keyword.
+Its syntax is described in the [Controllers](./Controllers.md#command-keywords) section (see Command Keywords table).
 
 ---
 

@@ -45,6 +45,10 @@ When the Test Tone mode is enabled the front panel "Music On" LED will turn off.
 The LED will turn back on when the Test Tones are disabled;
 This indicates that the music source audio line input is active.
 
+The Test Tone function has the highest priorty and enabling it will suspend all active controllers.
+This is a web UI function; Controllers are prevented from changing its setting.
+It cannot be saved as a power up default.
+
 ### AUDIO MUTE
 Audio can be silenced by moving the ``Audio Mute`` slide switch to the right side.
 The RF Carrier and RadioText are not affected.

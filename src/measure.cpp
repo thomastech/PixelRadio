@@ -1,13 +1,12 @@
 /*
    File: measure.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-25-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -129,8 +128,8 @@ void initVdcBuffer(void)
 // processMeasurements(): Periodically perform voltage measurements. Must be called in main loop.
 void processMeasurements(void)
 {
-    long currentMillis             = millis(); // Snapshot of System Timer.
-    static long previousMeasMillis = millis(); // Timer for Voltage Measurement.
+    uint32_t currentMillis             = millis(); // Snapshot of System Timer.
+    static uint32_t previousMeasMillis = millis(); // Timer for Voltage Measurement.
 
     currentMillis = millis();
 

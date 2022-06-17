@@ -148,6 +148,19 @@ Enabling it requires moving a 0402 size SMD resistor.
 
 The resistor is a 0-ohm jumper that normally connects the RF signal to the PCB mounted antenna.
 Moving the resistor disables the internal antenna and re-routes the RF signal to the u.FL connector.
+Be forewarned that it is a tiny 0402 size SMD component that requires good SMT soldering skills to relocate.
+
+<table>
+  <tr>
+    <th><center>FACTORY INTERNAL WIFI ANTENNA</center></th>
+    <th><center>EXTERNAL ANTENNA MODIFICATION</center></th>
+  </tr>
+  <tr>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/ESP32_Ant_Int1_1200.png" width="250"></td>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/ESP32_Ant_Ext1_1200.png" width="250"></td>
+  </tr>
+</table>
+
 
 Along with moving the resistor you will also need to purchase an 8cm long [SMA to u.FL cable](https://www.aliexpress.com/item/4000848776660.html) and mating [2.4GHz WiFi antenna](https://www.aliexpress.com/item/1005001368629647.html).
 The project's 3D Printed End Panel includes a mounting hole for installing the external antenna.
@@ -155,6 +168,12 @@ The project's 3D Printed End Panel includes a mounting hole for installing the e
 >Note: The cable and antenna are sold in two variants, SMA and RP-SMA.
 Either can be used, but do NOT mix them;
 If the cable is SMA then the antenna must also be SMA.
+
+<table>
+  <tr>
+    <td><img style="padding-right: 10px; padding-bottom: 5px;" align="left" src="../Images/ESP32_Ant_Ext2_1200.png" width="400"></td>
+  </tr>
+</table>
 
 &nbsp;&nbsp;&nbsp;
 

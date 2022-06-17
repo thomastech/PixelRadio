@@ -1,13 +1,12 @@
 /*
    File: webserver.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-30-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -91,19 +90,21 @@ int16_t getCommandArg(String& requestStr, uint8_t maxSize) {
             argStop = requestStr.length();
         }
         argStr = requestStr.substring(argStart + 1, argStop - 1);
+        argStr = urlDecode(argStr); // Convert any URL encoded text to ASCII.
+//      argStr.replace("%20", " ");  // Replace the html space with ASCII text.
         argStr.trim();
 
         if (argStr.length() > maxSize) {
             argStr = argStr.substring(0, maxSize);
         }
         else if (argStr.length() == 0) {
-            return -1;              // Fail, Argument Missing.
+            return -1; // Fail, Argument Missing.
         }
-        argStr.replace("%20", " "); // Replace the html formatted spaces with text spaces.
-        argStr.trim();              // Trim one more time.
+
+        argStr.trim(); // Trim one more time.
         requestStr = argStr;
     }
-    else {                          // Fail, Improper Argument Provided.
+    else {             // Fail, Improper Argument Provided.
         requestStr = "";
         return -1;
     }
@@ -264,7 +265,7 @@ void processWebClient(void)
                 char c = client.read();
 
                 if (charCnt < HTTP_RESPONSE_MAX_SZ) {
-                    //Serial.write(c); // DEBUG ONLY: Log saved URI chars to serial monitor.
+                    // Serial.write(c); // DEBUG ONLY: Log saved URI chars to serial monitor.
                     requestStr += c; // Build URI string.
                     charCnt++;
                 }
@@ -299,7 +300,8 @@ void processWebClient(void)
                                     if ((c == '\r') || (c == '\n')) {
                                         break;
                                     }
-                                    //Serial.write(c); // DEBUG ONLY: Log saved URI chars to serial monitor.
+
+                                    // Serial.write(c); // DEBUG ONLY: Log saved URI chars to serial monitor.
                                     requestStr += c; // Build URI string.
                                     charCnt++;
                                 }
@@ -485,6 +487,31 @@ void processWebClient(void)
                             client.println(HTML_CLOSE_STR);
                         }
 
+                        // ************* PTY CODE COMMAND ****************
+                        else if (requestLcStr.indexOf(makeHttpCmdStr(CMD_PTYCODE_STR)) >= 0) {
+                            Log.infoln("-> HTTP CMD: PTY CODE");
+
+                            if (getCommandArg(requestStr, CMD_PTY_MAX_SZ) == -1) {
+                                successFlg = false;
+                                Log.errorln("-> HTTP CMD: PTY Code Missing Value (abort).");
+                            }
+                            else {
+                                if (ptyCodeCmd(requestStr, HTTP_CNTRL) == false) {
+                                    successFlg = false;
+                                }
+                            }
+                            client.print(HTML_HEADER_STR);
+                            client.print(HTML_DOCTYPE_STR);
+
+                            if (successFlg) {
+                                client.printf("{\"%s\": \"ok\"}\r\n", CMD_PTYCODE_STR);
+                            }
+                            else {
+                                client.printf("{\"%s\": \"fail\"}\r\n", CMD_PTYCODE_STR);
+                            }
+                            client.println(HTML_CLOSE_STR);
+                        }
+
                         // ********PROGRAM SERVICE NAME COMMAND *********
                         else if (requestLcStr.indexOf(makeHttpCmdStr(CMD_PSN_STR)) >= 0) {
                             Log.infoln("-> HTTP CMD: PSN (Program Service Name)");
@@ -532,6 +559,31 @@ void processWebClient(void)
                             }
                             else {
                                 client.printf("{\"%s\": \"fail\"}\r\n", CMD_RADIOTEXT_STR); // JSON Fmt.
+                            }
+                            client.println(HTML_CLOSE_STR);
+                        }
+
+                        // ************ RFC COMMAND ***************
+                        else if (requestLcStr.indexOf(makeHttpCmdStr(CMD_RF_CARRIER_STR)) >= 0) {
+                            Log.infoln("-> HTTP CMD: RFC (RF Carrier Control)");
+
+                            if (getCommandArg(requestStr, CMD_RF_MAX_SZ) == -1) {
+                                successFlg = false;
+                                Log.errorln("-> HTTP CMD: RFC, Missing Value (abort).");
+                            }
+                            else {
+                                if (rfCarrierCmd(requestStr, HTTP_CNTRL) == false) {
+                                    successFlg = false;
+                                }
+                            }
+                            client.print(HTML_HEADER_STR);
+                            client.print(HTML_DOCTYPE_STR);
+
+                            if (successFlg) {
+                                client.printf("{\"%s\": \"ok\"}\r\n", CMD_RF_CARRIER_STR);   // JSON Fmt.
+                            }
+                            else {
+                                client.printf("{\"%s\": \"fail\"}\r\n", CMD_RF_CARRIER_STR); // JSON Fmt.
                             }
                             client.println(HTML_CLOSE_STR);
                         }
@@ -688,13 +740,59 @@ void processDnsServer(void)
     dnsServer.processNextRequest();
 }
 
+// *********************************************************************************************
+// urlDecode(): Convert URL encoding into ASII.
+String urlDecode(String urlStr)
+{
+    String encodeStr = "";
+    char   c;
+    char   code0;
+    char   code1;
+
+    for (int i = 0; i < urlStr.length(); i++) {
+        c = urlStr.charAt(i);
+
+        if (c == '%') {
+            code0 = urlStr.charAt(++i);
+            code1 = urlStr.charAt(++i);
+            c = (urlDecodeHex(code0) << 4) | urlDecodeHex(code1);
+            encodeStr += c;
+        }
+        else if (c == '+') {
+            encodeStr += ' ';
+        }
+        else {
+            encodeStr += c;
+        }
+    }
+
+    return encodeStr;
+}
+
+// *********************************************************************************************
+// urlDecodeHex(): convert hex to integer base. This is companion function for urlDecode().
+unsigned char urlDecodeHex(char c)
+{
+    if (c >= '0' && c <='9'){
+        return((unsigned char)c - '0');
+    }
+    if (c >= 'a' && c <='f'){
+        return((unsigned char)c - 'a' + 10);
+    }
+    if (c >= 'A' && c <='F'){
+        return((unsigned char)c - 'A' + 10);
+    }
+
+    return(0);
+}
+
 // ************************************************************************************************
 // wifiReconnect(): If WiFI not connected, or in AP mode, then peridoically atttempt a STA reconnect.
 void wifiReconnect(void)
 {
     uint8_t apCount = 0;
     char    charBuff[40];
-    static long previousWiFiMillis = 0; // Timer for WiFi services.
+    static uint32_t previousWiFiMillis = 0; // Timer for WiFi services.
 
     apCount = WiFi.softAPgetStationNum();
 
@@ -719,7 +817,13 @@ void wifiReconnect(void)
                 Log.infoln(charBuff);
             }
         }
-        previousWiFiMillis = millis(); // Update timer on exit.
+
+        if (WiFi.status() == WL_CONNECTED) {
+            ipAddrStr = WiFi.localIP().toString().c_str();
+            updateUiIpaddress(ipAddrStr);
+        }
+
+        previousWiFiMillis = millis(); // Reset Reconnect Period.
     }
 }
 

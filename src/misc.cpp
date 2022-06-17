@@ -1,13 +1,12 @@
 /*
    File: misc.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-03-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -18,7 +17,6 @@
 #include <ArduinoLog.h>
 #include <EEPROM.h>
 #include <SPI.h>
-#include <Tone32.h>
 #include <Wire.h>
 #include "QN8027Radio.h"
 #include "PixelRadio.h"
@@ -201,12 +199,59 @@ void setGpioBootPins(void)
 // This function should be called after any SPI usage (such as RD/WR SD Card). It will allow for
 // more reliable Code Flashing if the SD Card remains installed.
 void spiSdCardShutDown(void) {
-    pinMode(SD_CS_PIN, OUTPUT);        // SD Card Chip Select.
-    digitalWrite(SD_CS_PIN, HIGH);     // CS Active Low. High = Disable SD Card.
+    pinMode(SD_CS_PIN, OUTPUT);          // SD Card Chip Select.
+    digitalWrite(SD_CS_PIN, HIGH);       // CS Active Low. High = Disable SD Card.
 
-    pinMode(MISO_PIN, INPUT_PULLDOWN); // SD D0, Allow pin to Pulldown Low (for reliable Flashing).
-    pinMode(MOSI_PIN,   INPUT_PULLUP); // SD CMD, Allow pin to Pullup High (for reliable Flashing).
-    pinMode(SD_CLK_PIN, INPUT_PULLUP); // SD CLK.
+    pinMode(MISO_PIN,   INPUT_PULLDOWN); // SD D0, Allow pin to Pulldown Low (for reliable Flashing).
+    pinMode(MOSI_PIN,   INPUT_PULLUP);   // SD CMD, Allow pin to Pullup High (for reliable Flashing).
+    pinMode(SD_CLK_PIN, INPUT_PULLUP);   // SD CLK.
+}
+
+// *********************************************************************************************
+// strIsUint(): Check if string is unsigned integer. Return true if uint.
+bool strIsUint(String intStr) {
+    uint8_t i;
+
+    if(intStr.length() == 0) {
+        return false;
+    }
+
+    for (i = 0; i < intStr.length(); i++) { // Arg must be integer >= 0.
+        char c = intStr.charAt(i);
+
+        if ((c == '-') || (c < '0') || (c > '9')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// *********************************************************************************************
+// toneInit(): Initialize the test tone generator (ESP32 led write) hardware.
+//             This function should be called in setup().
+void toneInit(void)
+{
+    ledcSetup(TEST_TONE_CHNL, 1000, 8);
+}
+
+// *********************************************************************************************
+// toneOff(): Turn off the test tone generator.
+void toneOff(uint8_t pin, uint8_t channel)
+{
+    ledcDetachPin(pin);
+    ledcWrite(channel, 0);
+}
+
+// *********************************************************************************************
+// toneOn(): Turn on the test tone generator.
+void toneOn(uint8_t pin, uint16_t freq, uint8_t channel)
+{
+    if (ledcRead(channel)) {
+        Log.warningln("Ignored Tone Request: Channel %u is already in-use", channel);
+        return;
+    }
+    ledcAttachPin(pin, channel);
+    ledcWriteTone(channel, freq);
 }
 
 // *********************************************************************************************
@@ -221,67 +266,110 @@ void updateGpioBootPins(void) {
 }
 
 // *********************************************************************************************
-// updateTestTones(): If in Test Mode then Produce Audible Test Tones for Radio Installation Testing.
-//                    Also Sends Special RadioText message with Elapsed Time.
-//                    On entry, true==Reset Tone Sequence.
+// updateTestTones(): Test Tone mode creates cascading audio tones for Radio Installation Tests.
+//                    On entry, true will Reset Tone Sequence.
+//                    The tone sequence is sent every five seconds.
+//                    Also Sends Special RadioText message with approximate Elapsed Time.
 void updateTestTones(bool resetTimerFlg)
 {
-    char rdsBuff[50];
-    static uint8_t state = 0;
-    long seconds;
-    long minutes;
-    long hours;
-    uint32_t secs;
-    const uint16_t toneList[]   = { NOTE_A3, NOTE_E4, NOTE_A3, NOTE_C4, NOTE_C5, NOTE_F4, NOTE_F4, NOTE_A4, 0, 0, 0 };
-    const uint8_t  listSize     = sizeof(toneList) / sizeof(uint16_t);
-    uint32_t clockMillis        = millis();
-    static uint32_t baseMillis  = millis();
+    char rdsBuff[sizeof(AUDIO_TEST_STR) + 25];
+    static bool rstFlg          = false; // Reset State Machine FLag.
+    static bool goFlg           = false; // Go Flag, send new tone sequence if true.
+    static bool toneFlg         = false; // Tone Generator is On Flag.
+    static uint8_t  hours       = 0;
+    static uint8_t  minutes     = 0;
+    static uint8_t  seconds     = 0;
+    static uint8_t  state       = 0;
+    static uint32_t clockMillis = millis();
     static uint32_t timerMillis = millis();
+    uint32_t currentMillis      = millis();
 
-    if (!testModeFlg) {
-        digitalWrite(MUX_PIN, TONE_OFF); // Switch Audio Mux chip to Line-In.
+    const uint16_t toneList[] =
+    { TONE_NONE, TONE_NONE, TONE_NONE, TONE_A3, TONE_E4, TONE_A3, TONE_C4, TONE_C5, TONE_F4, TONE_F4, TONE_A4, TONE_NONE };
+    const uint8_t listSize = sizeof(toneList) / sizeof(uint16_t);
+
+    if (resetTimerFlg) { // Caller requests a full state machine reset on next Test Tone.
+        rstFlg = true;
         return;
     }
-    else if (resetTimerFlg) {   // Reset Tone Sequence.
-        baseMillis  = millis();
-        timerMillis = baseMillis - TEST_TONE_TIME;
-        state       = 0;
-        return;                          // Must return here (prevents exception error from UI callback);
+    else if (!testModeFlg) {
+        goFlg = false;
+        state = 0;
+        digitalWrite(MUX_PIN, TONE_OFF); // Switch Audio Mux chip to Line-In.
+
+        if (toneFlg == true) {           // Kill active tone generator.
+            toneFlg = false;
+            toneOff(TONE_PIN, TEST_TONE_CHNL);
+        }
+        return;
     }
 
-    digitalWrite(MUX_PIN, TONE_ON);      // Switch Audio Mux chip to Test Tones.
+    digitalWrite(MUX_PIN, TONE_ON); // Switch Audio Mux chip to Test Tones.
 
-    clockMillis = millis() - baseMillis; // Elasped Time.
-    secs        =  clockMillis / MSECS_PER_SEC;
-    hours       = numberOfHours(secs);
-    minutes     = numberOfMinutes(secs);
-    seconds     = numberOfSeconds(secs);
+    if (rstFlg == true) {           // State machine reset was requested.
+        rstFlg      = false;
+        goFlg       = true;         // Request tone sequence now.
+        clockMillis = millis();
+        timerMillis = clockMillis;
+        hours       = 0;
+        minutes     = 0;
+        seconds     = 0;
+        state       = 0;
+    }
 
-    if (millis() >= timerMillis + TEST_TONE_TIME) {
+    // Update the test tone clock. HH:MM:SS will be sent as RadioText.
+    if ((currentMillis - clockMillis) >= 1000) {
+        clockMillis = millis() - ((currentMillis - clockMillis) - 1000);
+        seconds++;
+
+        if (seconds >= 60) {
+            seconds = 0;
+            minutes++;
+
+            if (minutes >= 60) {
+                minutes = 0;
+                hours++;
+
+                if (hours >= 100) { // Clock wraps at 99:59:59.
+                    hours = 0;
+                }
+            }
+        }
+    }
+
+    if (seconds % 5 == 0) { // Send new tone sequence every five seconds.
+        goFlg = true;
+    }
+
+    if (goFlg && (millis() >= timerMillis + TEST_TONE_TIME)) {
         timerMillis = millis();
+        toneFlg     = false;
+        toneOff(TONE_PIN, TEST_TONE_CHNL);
+        delay(5);               // Allow a bit of time for tone channel to shutdown.
 
-        if (state < listSize) {
-            if (state == 0) {
-                sprintf(rdsBuff, "PIXELRADIO AUDIO TEST  [ %02ld:%02ld:%02ld ]", hours, minutes, seconds);
-                radio.sendStationName("TestTone");
+        if (state < listSize) { // Cycle through the tone table.
+            if (state == 0) {   // Time to send RadioText message.
+                state++;
+                sprintf(rdsBuff, "%s  [ %02u:%02u:%02u ]", AUDIO_TEST_STR, hours, minutes, seconds);
                 String tmpStr = rdsBuff;
+                radio.sendStationName(AUDIO_PSN_STR);
                 radio.sendRadioText(tmpStr);
                 updateUiRdsText(tmpStr);
-                updateUiRDSTmr(0); // Clear Displayed Elapsed Timer.
-                delay(100);        // Wait for RDS Buffer to empty before applying Tones.
-                tone(TONE_PIN, toneList[state], 250, TEST_TONE_CHNL);
+                updateUiRDSTmr(0);     // Clear Displayed Elapsed Timer.
                 Log.verboseln("New Test Tone Sequence, RadioText Sent.");
+                return;                // We will send the tones on next entry.
             }
-            else if (toneList[state] > 0) {
-                tone(TONE_PIN, toneList[state], 250, TEST_TONE_CHNL);
+
+            if (toneList[state] > 0) { // Time to send tones from toneList[] table).
+                toneFlg = true;
+                toneOn(TONE_PIN, toneList[state], TEST_TONE_CHNL);
             }
-            else {
-                noTone(TONE_PIN, TEST_TONE_CHNL);
-            }
+
             state++;
         }
-        else {
+        else { // At end of Tone table, done with this sequence.
             state = 0;
+            goFlg = false;
         }
     }
 }

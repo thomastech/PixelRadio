@@ -1,13 +1,12 @@
 /*
    File: commands.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-22-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this
    license absolutely no warranty is given.
@@ -85,7 +84,7 @@ uint8_t getControllerStatus(void)
 // AudioModeCmd(): Set the Mono/Stereo Audio Mode using the Payload String. On exit, return true if success.
 bool audioModeCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_AUD_MAX_SZ;
     String controllerStr;
 
@@ -114,7 +113,7 @@ bool audioModeCmd(String payloadStr, uint8_t controller)
         updateUiAudioMode();
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid Audio Mode Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid Audio Mode Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -129,7 +128,7 @@ bool audioModeCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool frequencyCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_FREQ_MAX_SZ;
     int16_t freq;
     String  controllerStr;
@@ -149,8 +148,9 @@ bool frequencyCmd(String payloadStr, uint8_t controller)
 
     freq = payloadStr.toInt();
 
-    if ((freq < FM_FREQ_MIN_X10) || (freq > FM_FREQ_MAX_X10)) {
-        sprintf(logBuff, "-> %s Controller: Invalid Radio Frequency Payload, Ignored.", controllerStr.c_str());
+    if ((!strIsUint(payloadStr)) ||
+        (freq < FM_FREQ_MIN_X10) || (freq > FM_FREQ_MAX_X10)) {
+        sprintf(logBuff, "-> %s Controller: Invalid Radio Frequency Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -311,7 +311,7 @@ bool gpioCmd(String payloadStr, uint8_t controller, uint8_t pin)
         }
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid GPIO Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid GPIO Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -322,7 +322,7 @@ bool gpioCmd(String payloadStr, uint8_t controller, uint8_t pin)
 // *************************************************************************************************************************
 bool infoCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_SYS_MAX_SZ;
     String controllerStr;
 
@@ -345,7 +345,7 @@ bool infoCmd(String payloadStr, uint8_t controller)
         Log.verboseln(logBuff);
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid INFO Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid INFO Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -357,7 +357,7 @@ bool infoCmd(String payloadStr, uint8_t controller)
 // This command is only used by the Serial Controller; The MQTT and HTTP controllers do not observe this command.
 bool logCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_LOG_MAX_SZ;
     String controllerStr;
 
@@ -390,7 +390,7 @@ bool logCmd(String payloadStr, uint8_t controller)
         Log.setShowLevel(false); // Do not show loglevel, we will do this in the prefix
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid LOG Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid LOG Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -402,7 +402,7 @@ bool logCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool muteCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_MUTE_MAX_SZ;
     String controllerStr;
 
@@ -435,7 +435,7 @@ bool muteCmd(String payloadStr, uint8_t controller)
         updateUiAudioMute();
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid MUTE Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid MUTE Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -445,7 +445,7 @@ bool muteCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool piCodeCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_PI_MAX_SZ;
     uint32_t tempPiCode;
     String   controllerStr;
@@ -466,7 +466,7 @@ bool piCodeCmd(String payloadStr, uint8_t controller)
     tempPiCode = strtol(payloadStr.c_str(), NULL, HEX);
 
     if ((tempPiCode < RDS_PI_CODE_MIN) || (tempPiCode > RDS_PI_CODE_MAX)) {
-        sprintf(logBuff, "-> %s Controller: Invalid RDS PI Code Value, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid RDS PI Code Value (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -497,11 +497,73 @@ bool piCodeCmd(String payloadStr, uint8_t controller)
 }
 
 // *************************************************************************************************************************
+bool ptyCodeCmd(String payloadStr, uint8_t controller)
+{
+    char logBuff[100];
+    const  uint8_t maxSize = CMD_PTY_MAX_SZ;
+    int16_t tempPtyCode;
+    String  controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> ptyCodeCmd: Undefined Controller!");
+        return false;
+    }
+
+    payloadStr.trim();
+
+    if (payloadStr.length() > maxSize) {
+        payloadStr = payloadStr.substring(0, maxSize);
+    }
+    tempPtyCode = payloadStr.toInt();
+
+    if ((strIsUint(payloadStr) == false) ||
+        (tempPtyCode < RDS_PTY_CODE_MIN) ||
+        (tempPtyCode > RDS_PTY_CODE_MAX)) {
+        sprintf(logBuff, "-> %s Controller: Invalid RDS PTY Code Value (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
+        Log.errorln(logBuff);
+        return false;
+    }
+    else {
+        if (radio.getPTYCode() != (uint8_t)(tempPtyCode)) { // New PTY Code.
+            if (controller == SERIAL_CNTRL) {
+                rdsSerialPtyCode = (uint8_t)(tempPtyCode);
+                textSerialFlg    = true;                    // Reload Serial RDS values
+            }
+            else if (controller == MQTT_CNTRL) {
+                rdsMqttPtyCode = (uint8_t)(tempPtyCode);
+                textMqttFlg    = true; // Reload MQTT RDS values
+            }
+            else if (controller == HTTP_CNTRL) {
+                rdsHttpPtyCode = (uint8_t)(tempPtyCode);
+                textHttpFlg    = true; // Reload HTTP RDS values
+            }
+
+            displaySaveWarning();
+            sprintf(logBuff, "-> %s Controller: PTY Code Set to %d.", controllerStr.c_str(), tempPtyCode);
+        }
+        else {
+            sprintf(logBuff, "-> %s Controller: PTY Code Unchanged (%d).", controllerStr.c_str(), tempPtyCode);
+        }
+        Log.verboseln(logBuff);
+    }
+    return true;
+}
+
+// *************************************************************************************************************************
 bool programServiceNameCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[60 + RDS_PSN_MAX_SZ];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_PSN_MAX_SZ;
     String controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> programServiceNameCmd: Undefined Controller!");
+        return false;
+    }
 
     payloadStr.trim();
 
@@ -512,22 +574,16 @@ bool programServiceNameCmd(String payloadStr, uint8_t controller)
     if (controller == SERIAL_CNTRL) {
         rdsSerialPsnStr = payloadStr;
         textSerialFlg   = true; // Reload Serial RDS values
-        controllerStr   = "Serial";
     }
     else if (controller == MQTT_CNTRL) {
         rdsMqttPsnStr = payloadStr;
         textMqttFlg   = true; // Reload MQTT RDS values
-        controllerStr = "MQTT";
     }
     else if (controller == HTTP_CNTRL) {
         rdsHttpPsnStr = payloadStr;
         textHttpFlg   = true; // Reload HTTP RDS values
-        controllerStr = "HTTP";
     }
-    else {
-        Log.errorln("-> programServiceNameCmd: Undefined Controller!");
-        return false;
-    }
+
     sprintf(logBuff, "-> %s Controller: RDS PSN Set to %s", controllerStr.c_str(), payloadStr.c_str());
     Log.verboseln(logBuff);
     return true;
@@ -536,9 +592,16 @@ bool programServiceNameCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool radioTextCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[70 + RDS_TEXT_MAX_SZ];
+    char logBuff[100 + CMD_RT_MAX_SZ];
     const  uint8_t maxSize = CMD_RT_MAX_SZ;
     String controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> radioTextCmd: Undefined Controller!");
+        return false;
+    }
 
     payloadStr.trim();
 
@@ -549,21 +612,14 @@ bool radioTextCmd(String payloadStr, uint8_t controller)
     if (controller == SERIAL_CNTRL) {
         textSerialFlg    = true; // Reload Serial RDS values
         rdsSerialTextStr = payloadStr;
-        controllerStr    = "Serial";
     }
     else if (controller == MQTT_CNTRL) {
         textMqttFlg    = true; // Reload MQTT RDS values
         rdsMqttTextStr = payloadStr;
-        controllerStr  = "MQTT";
     }
     else if (controller == HTTP_CNTRL) {
         textHttpFlg    = true; // Reload HTTP RDS values
         rdsHttpTextStr = payloadStr;
-        controllerStr  = "HTTP";
-    }
-    else {
-        Log.errorln("-> radioTextCmd: Undefined Controller!");
-        return false;
     }
 
     sprintf(logBuff, "-> %s Controller: RadioText Changed to %s", controllerStr.c_str(), payloadStr.c_str());
@@ -576,15 +632,21 @@ bool radioTextCmd(String payloadStr, uint8_t controller)
 bool rdsTimePeriodCmd(String payloadStr, uint8_t controller)
 {
     bool capFlg = false;
-    char logBuff[80];
-    const  uint8_t maxSize = CMD_TIME_MAX_SZ;
-    int32_t rtTime         = 0;
+    char logBuff[100];
+    int32_t rtTime = 0;
     String  controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> rdsTimePeriodCmd: Undefined Controller!");
+        return false;
+    }
 
     payloadStr.trim();
     rtTime = strtol(payloadStr.c_str(), NULL, 10);
 
-    if ((payloadStr.length() > maxSize) || (rtTime == 0)) {
+    if ((payloadStr.length() > CMD_TIME_MAX_SZ) || (rtTime <= 0)) {
         Log.errorln("-> RDS Time Period Value is Invalid, Ignored.");
         return false;
     }
@@ -592,32 +654,26 @@ bool rdsTimePeriodCmd(String payloadStr, uint8_t controller)
         capFlg = true;
         rtTime = RDS_DSP_TM_MAX;
     }
-    else if (rdsMqttMsgTime < 5) {
-        rtTime = 5;
+    else if (rtTime < RDS_DSP_TM_MIN) {
+        capFlg = true;
+        rtTime = RDS_DSP_TM_MIN;
     }
 
     if (controller == SERIAL_CNTRL) {
         textSerialFlg    = true; // Restart Serial Controller's RDS.
         rdsSerialMsgTime = rtTime * 1000;
-        controllerStr    = "Serial";
     }
     else if (controller == MQTT_CNTRL) {
         textMqttFlg    = true; // Restart MQTT Controller's RDS.
         rdsMqttMsgTime = rtTime * 1000;
-        controllerStr  = "MQTT";
     }
     else if (controller == HTTP_CNTRL) {
         textHttpFlg    = true; // Restart HTTP Controller's RDS.
         rdsHttpMsgTime = rtTime * 1000;
-        controllerStr  = "HTTP";
-    }
-    else {
-        Log.errorln("-> rdsTimeCmd: Undefined Controller!");
-        return false;
     }
 
     if (capFlg) {
-        sprintf(logBuff, "-> %s Controller: RDS Time Period Value too large, capped at %d secs.", controllerStr.c_str(), RDS_DSP_TM_MAX);
+        sprintf(logBuff, "-> %s Controller: RDS Time Period Value out-of-range, set to %d secs.", controllerStr.c_str(), rtTime);
     }
     else {
         sprintf(logBuff, "-> %s Controller: RDS Time Period Set to %d Secs.", controllerStr.c_str(), rtTime);
@@ -630,7 +686,7 @@ bool rdsTimePeriodCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool rebootCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_SYS_MAX_SZ;
     String controllerStr;
 
@@ -654,7 +710,7 @@ bool rebootCmd(String payloadStr, uint8_t controller)
         rebootFlg = true; // Request system reboot.
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid REBOOT Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid REBOOT Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -662,9 +718,53 @@ bool rebootCmd(String payloadStr, uint8_t controller)
 }
 
 // *************************************************************************************************************************
+bool rfCarrierCmd(String payloadStr, uint8_t controller)
+{
+    char logBuff[100];
+    const  uint8_t maxSize = CMD_RF_MAX_SZ;
+    String controllerStr;
+
+    controllerStr = getControllerName(controller);
+
+    if (controllerStr.length() == 0) {
+        Log.errorln("-> rfCarrierCmd: Undefined Controller!");
+        return false;
+    }
+
+    payloadStr.trim();
+    payloadStr.toLowerCase();
+
+    if (payloadStr.length() > maxSize) {
+        payloadStr = payloadStr.substring(0, maxSize);
+    }
+
+    if (payloadStr == CMD_RF_ON_STR) {
+        sprintf(logBuff, "-> %s Controller: RF Carrier Set to ON.", controllerStr.c_str());
+        Log.verboseln(logBuff);
+        rfCarrierFlg  = true;
+        newCarrierFlg = true;
+        updateUiRfCarrier();
+    }
+    else if (payloadStr == CMD_RF_OFF_STR) {
+        sprintf(logBuff, "-> %s Controller: RF Carrier Set to OFF.", controllerStr.c_str());
+        Log.verboseln(logBuff);
+        rfCarrierFlg  = false;
+        newCarrierFlg = true;
+        updateUiRfCarrier();
+    }
+    else {
+        sprintf(logBuff, "-> %s Controller: Invalid RF Carrier Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
+        Log.errorln(logBuff);
+        return false;
+    }
+
+    return true;
+}
+
+// *************************************************************************************************************************
 bool startCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_RDS_MAX_SZ;
     String controllerStr;
 
@@ -697,7 +797,7 @@ bool startCmd(String payloadStr, uint8_t controller)
         }
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid START Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid START Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }
@@ -707,7 +807,7 @@ bool startCmd(String payloadStr, uint8_t controller)
 // *************************************************************************************************************************
 bool stopCmd(String payloadStr, uint8_t controller)
 {
-    char logBuff[80];
+    char logBuff[100];
     const  uint8_t maxSize = CMD_RDS_MAX_SZ;
     String controllerStr;
 
@@ -740,7 +840,7 @@ bool stopCmd(String payloadStr, uint8_t controller)
         }
     }
     else {
-        sprintf(logBuff, "-> %s Controller: Invalid STOP Payload, Ignored.", controllerStr.c_str());
+        sprintf(logBuff, "-> %s Controller: Invalid STOP Payload (%s), Ignored.", controllerStr.c_str(), payloadStr.c_str());
         Log.errorln(logBuff);
         return false;
     }

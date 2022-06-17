@@ -1,13 +1,12 @@
 /*
    File: webGUI.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Apr-06-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this
    license absolutely no warranty is given.
@@ -90,11 +89,7 @@
 #include "globals.h"
 #include "language.h"
 #include "ESPUI.h"
-#include "QN8027Radio.h"
 
-// ************************************************************************************************
-
-extern QN8027Radio radio;
 
 // ************************************************************************************************
 // Local Strings.
@@ -192,7 +187,7 @@ uint16_t rdsEnb1ID     = 0;
 uint16_t rdsEnb2ID     = 0;
 uint16_t rdsEnb3ID     = 0;
 uint16_t rdsPiID       = 0;
-uint16_t rdsPiMsgID    = 0;
+uint16_t rdsPtyID      = 0;
 uint16_t rdsProgNameID = 0;
 uint16_t rdsSaveID     = 0;
 uint16_t rdsSaveMsgID  = 0;
@@ -264,8 +259,10 @@ void initCustomCss(void)
     ESPUI.setPanelStyle(radioGainID,    "font-size: 1.15em;");
     ESPUI.setPanelStyle(radioSoundID,   "font-size: 1.25em;");
 
+    ESPUI.setPanelStyle(rdsDspTmID,     "font-size: 1.15em;");
     ESPUI.setPanelStyle(rdsProgNameID,  "font-size: 1.35em;");
     ESPUI.setPanelStyle(rdsPiID,        "font-size: 1.35em;");
+    ESPUI.setPanelStyle(rdsPtyID,       "font-size: 1.15em;");
 
     // ESPUI.setPanelStyle(rdsProgNameID, "width: 45%; font-size: 1.5em;"); // Bug? See
     //  https://github.com/s00500/ESPUI/pull/147#issuecomment-1009821269.
@@ -317,15 +314,13 @@ void initCustomCss(void)
 
     // ESPUI.setElementStyle(homeLogoID,       "max-width: 45%; background-color: white; color: black;"); // DOES NOT WORK.
 
-    ESPUI.setElementStyle(radioFreqID,      "width: 75%;");
-    ESPUI.setElementStyle(radioGainID,      "width: 35%;");
-    ESPUI.setElementStyle(radioAudioMsgID,  CSS_LABEL_STYLE_BLACK);
-    ESPUI.setElementStyle(radioSaveMsgID,   CSS_LABEL_STYLE_RED);
-    ESPUI.setElementStyle(radioSoundID,     "max-width: 35%;");
+    ESPUI.setElementStyle(radioFreqID,     "width: 75%;");
+    ESPUI.setElementStyle(radioGainID,     "width: 35%;");
+    ESPUI.setElementStyle(radioAudioMsgID, CSS_LABEL_STYLE_BLACK);
+    ESPUI.setElementStyle(radioSaveMsgID,  CSS_LABEL_STYLE_RED);
+    ESPUI.setElementStyle(radioSoundID,    "max-width: 35%;");
 
     // ESPUI.setElementStyle(rdsPiID,          "font-size: 1.25em;");
-    ESPUI.setElementStyle(rdsPiMsgID,       "font-size: 0.8em; background-color: unset; color: black;");
-
     // ESPUI.setElementStyle(rdsProgNameID,    "color: black;");
     ESPUI.setElementStyle(rdsSaveMsgID,     CSS_LABEL_STYLE_BLACK);
     ESPUI.setElementStyle(rdsText1MsgID,    CSS_LABEL_STYLE_BLACK);
@@ -494,7 +489,6 @@ void displaySaveWarning(void)
     ESPUI.print(radioSaveMsgID,     SAVE_SETTINGS_MSG_STR);
     ESPUI.print(rdsSaveMsgID,       SAVE_SETTINGS_MSG_STR);
     ESPUI.print(wifiSaveMsgID,      SAVE_SETTINGS_MSG_STR);
-
 }
 
 // ************************************************************************************************
@@ -530,7 +524,7 @@ void startGUI(void)
 void updateUiAudioLevel(void)
 {
     uint16_t mV;
-    static long previousMillis = 0;
+    static uint32_t previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {
@@ -576,7 +570,7 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
     char gpioBuff[50];
     char setBuff[30];
     uint16_t msgID;
-    String controllerStr;
+    String   controllerStr;
 
     controllerStr = getControllerName(controller);
     controllerStr.toUpperCase();
@@ -588,6 +582,7 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
 
     if (pin == GPIO19_PIN) {
         msgID = gpio19MsgID;
+
         if (gpio19CtrlStr == CMD_GPIO_OUT_HIGH_STR) {
             sprintf(setBuff, "%s", GPIO_OUT_HI_STR);
         }
@@ -601,6 +596,7 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
     }
     else if (pin == GPIO23_PIN) {
         msgID = gpio23MsgID;
+
         if (gpio23CtrlStr == CMD_GPIO_OUT_HIGH_STR) {
             sprintf(setBuff, "%s", GPIO_OUT_HI_STR);
         }
@@ -614,6 +610,7 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
     }
     else if (pin == GPIO33_PIN) {
         msgID = gpio33MsgID;
+
         if (gpio33CtrlStr == CMD_GPIO_OUT_HIGH_STR) {
             sprintf(setBuff, "%s", GPIO_OUT_HI_STR);
         }
@@ -628,7 +625,6 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
     else {
         Log.errorln("-> updateUiGpioMsg: Undefined GPIO Pin.");
         return false;
-
     }
 
     sprintf(gpioBuff, "{ SET TO %s BY %s }", setBuff, controllerStr.c_str());
@@ -636,7 +632,6 @@ bool updateUiGpioMsg(uint8_t pin, uint8_t controller) {
 
     return true;
 }
-
 
 // ************************************************************************************************
 // updateUiIpaddress(): Update the IP address shown on homeTab and wifiTab.
@@ -713,10 +708,12 @@ void updateUiRdsText(String textStr)
 
 // ************************************************************************************************
 // updateUiRDSTmr(): Updates the GUI's RDS time on homeTab.
-//                    On Entry rdsMillis = snapshot time (for countdown calc). Or pass zero to "Disable" display.
-void updateUiRDSTmr(int32_t rdsMillis)
+//                    On Entry rdsMillis=snapshot time for countdown calc.
+//                    Or pass 0 to force "Expired" message.
+//                    Test mode clears the time field.
+void updateUiRDSTmr(uint32_t rdsMillis)
 {
-    long timeCnt = 0;
+     uint32_t timeCnt = 0;
 
     if (testModeFlg) {
         ESPUI.print(homeRdsTmrID, " ");
@@ -726,7 +723,7 @@ void updateUiRDSTmr(int32_t rdsMillis)
         timeCnt = rdsMsgTime - timeCnt;  // Now we have Countdown time.
         timeCnt = timeCnt / 1000;        // Coverted to Secs.
 
-        if (timeCnt >= 0) {
+        if (rdsMillis != 0 && (timeCnt >= 0 && timeCnt <= RDS_DSP_TM_MAX)) {
             tempStr  = timeCnt;
             tempStr += " Secs";
             ESPUI.print(homeRdsTmrID, tempStr);
@@ -744,11 +741,36 @@ void updateUiRDSTmr(int32_t rdsMillis)
 }
 
 // ************************************************************************************************
+// updateUiRfCarrier(): Updates the GUI's RF Carrier on homeTab and radiotab.
+void updateUiRfCarrier(void)
+{
+    ESPUI.updateControlValue(radioRfEnbID, rfCarrierFlg ? "1" : "0");
+
+    if (rfCarrierFlg == true) {
+        if (fmRadioTestCode == FM_TEST_FAIL) {
+            ESPUI.print(homeOnAirID, RADIO_FAIL_STR);   // Update homeTab panel.
+        }
+        else if (fmRadioTestCode == FM_TEST_VSWR) {
+            ESPUI.print(homeOnAirID, RADIO_VSWR_STR);   // Update homeTab panel.
+        }
+        else if ((paVolts < PA_VOLT_MIN) || (paVolts > PA_VOLT_MAX)) {
+            ESPUI.print(homeOnAirID, RADIO_VOLT_STR);   // Update homeTab panel.
+        }
+        else {
+            ESPUI.print(homeOnAirID, RADIO_ON_AIR_STR); // Update homeTab panel.
+        }
+    }
+    else {
+        ESPUI.print(homeOnAirID, RADIO_OFF_AIR_STR); // Update homeTab panel.
+    }
+}
+
+// ************************************************************************************************
 // updateUiRSSI(): Update the UI's RSSI label element with dBm value.
 //               Note: AP Mode doesn't receive a RSSI sgnal from a router, so it returns a special message.
 void updateUiRSSI(void)
 {
-    static long previousMillis = 0;
+    static uint32_t previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {
@@ -771,36 +793,66 @@ void updateUiRSSI(void)
 }
 
 // ************************************************************************************************
-// updateUiLocalPiCode() Update the Local PI Code on the rdsTab.
+// updateUiLocalMsgTime() Update the RadioText Message Time on the Local RDSTab.
+void updateUiLocalMsgTime(void)
+{
+    char dispBuff[10];
+
+    sprintf(dispBuff, "%d", rdsLocalMsgTime / 1000);
+    ESPUI.print(rdsDspTmID, dispBuff);
+}
+
+// ************************************************************************************************
+// updateUiLocalPiCode() Update the PI Code on the Local RDS Tab.
 void updateUiLocalPiCode(void)
 {
-    char piBuff[20];
+    char piBuff[15];
 
-    sprintf(piBuff, "%s :0x%04X", RDS_PI_CODE_STR, rdsLocalPiCode);
-    ESPUI.print(rdsPiMsgID, piBuff);
+    sprintf(piBuff, "0x%04X", rdsLocalPiCode);
+    ESPUI.print(rdsPiID, piBuff);
+}
+
+// ************************************************************************************************
+// updateUiLocalPtyCode() Update the PTY Code on the Local RDS Tab.
+void updateUiLocalPtyCode(void)
+{
+    char ptyBuff[10];
+
+    sprintf(ptyBuff, "%u", rdsLocalPtyCode);
+    ESPUI.print(rdsPtyID, ptyBuff);
 }
 
 // *********************************************************************************************
-// updateUiTimer(): Update Elapsed Time on diagTab Page. Show Days + HH:MM:SS.
-void updateUiTimer(void)
+// updateUiDiagTimer(): Update Elapsed Time on diagTab Page. Show Days + HH:MM:SS.
+void updateUiDiagTimer(void)
 {
-    char timeBuff[25];
-    uint8_t  seconds;
-    uint8_t  minutes;
-    uint8_t  hours;
-    int16_t  days;
-    uint32_t secs;
-    uint32_t clockMillis        = millis();
-    static uint32_t timerMillis = millis();
+    char timeBuff[30];
+    static uint8_t  seconds        = 0;
+    static uint8_t  minutes        = 0;
+    static uint8_t  hours          = 0;
+    static int16_t  days           = 0;
+    static uint32_t previousMillis = millis();
+    uint32_t currentMillis         = millis();
 
-    if (millis() >= timerMillis + ELAPSED_TMR_TIME) {
-        timerMillis = millis();
-        secs        = clockMillis / MSECS_PER_SEC;
-        days        = elapsedDays(secs);
-        hours       = numberOfHours(secs);
-        minutes     = numberOfMinutes(secs);
-        seconds     = numberOfSeconds(secs);
-        sprintf(timeBuff, "Days:%d + %02u:%02u:%02u", days, hours, minutes, seconds);
+    if ((currentMillis - previousMillis) >= 1000) {
+        previousMillis = millis() - ((currentMillis - previousMillis) - 1000);
+        seconds++;
+
+        if (seconds >= 60) {
+            seconds = 0;
+            minutes++;
+
+            if (minutes >= 60) {
+                minutes = 0;
+                hours++;
+
+                if (hours >= 24) {
+                    hours = 0;
+                    days++;
+                }
+            }
+        }
+        sprintf(timeBuff, "Days:%u + %02u:%02u:%02u", days, hours, minutes, seconds);
         ESPUI.print(diagTimerID, timeBuff);
     }
 }
@@ -808,7 +860,7 @@ void updateUiTimer(void)
 // ************************************************************************************************
 void updateUiVolts(void)
 {
-    static long previousMillis = 0;
+    static uint32_t previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {
@@ -852,6 +904,7 @@ void updateUiWfiMode(void)
 void buildGUI(void)
 {
     tempStr.reserve(125); // Avoid memory re-allocation fragments on the Global String.
+    char  charBuff[25];
     float tempFloat;
 
     // ************
@@ -877,7 +930,7 @@ void buildGUI(void)
     else if (fmRadioTestCode == FM_TEST_VSWR) {
         tempStr = RADIO_VSWR_STR;
     }
-    else if (paVolts < PA_VOLT_MIN || paVolts > PA_VOLT_MAX) {
+    else if ((paVolts < PA_VOLT_MIN) || (paVolts > PA_VOLT_MAX)) {
         tempStr = RADIO_VOLT_STR;
     }
     else {
@@ -982,17 +1035,18 @@ void buildGUI(void)
 
     // RF Power Control is not compatible with the RF Amp Circutry.
     // Low Power levels do not correctly excite the PA Transistor.
+
     /*
-    radioPwrID = ESPUI.addControl(ControlType::Select,
+       radioPwrID = ESPUI.addControl(ControlType::Select,
                                   RADIO_RF_POWER_STR,
                                   rfPowerStr,
                                   ControlColor::Emerald,
                                   radioTab,
                                   &rfPowerCallback);
-    ESPUI.addControl(ControlType::Option, RF_PWR_LOW_STR,  RF_PWR_LOW_STR,  ControlColor::Emerald, radioPwrID);
-    ESPUI.addControl(ControlType::Option, RF_PWR_MED_STR,  RF_PWR_MED_STR,  ControlColor::Emerald, radioPwrID);
-    ESPUI.addControl(ControlType::Option, RF_PWR_HIGH_STR, RF_PWR_HIGH_STR, ControlColor::Emerald, radioPwrID);
-    */
+       ESPUI.addControl(ControlType::Option, RF_PWR_LOW_STR,  RF_PWR_LOW_STR,  ControlColor::Emerald, radioPwrID);
+       ESPUI.addControl(ControlType::Option, RF_PWR_MED_STR,  RF_PWR_MED_STR,  ControlColor::Emerald, radioPwrID);
+       ESPUI.addControl(ControlType::Option, RF_PWR_HIGH_STR, RF_PWR_HIGH_STR, ControlColor::Emerald, radioPwrID);
+     */
 
     /*
        // RF Auto Off is NOT compatible with PixelRadio; Sending RDS Messages and/or using updateUiAudioLevel() will
@@ -1144,19 +1198,19 @@ void buildGUI(void)
         ESPUI.addControl(ControlType::Text, RDS_PROG_SERV_NM_STR, rdsLocalPsnStr, ControlColor::Alizarin, rdsTab,
                          &rdsTextCallback);
 
-    /*    char buff[10];
-        sprintf(buff, " :0x%04X", rdsLocalPiCode);
-        tempStr    = RDS_PI_CODE_STR;
-        tempStr   += buff;
-        rdsPiMsgID = ESPUI.addControl(ControlType::Label, "PI_CODE", tempStr, ControlColor::Alizarin, rdsProgNameID);
-     */
-    char buff[10];
-    sprintf(buff, "0x%04X", rdsLocalPiCode);
+    sprintf(charBuff, "0x%04X", rdsLocalPiCode);
     rdsPiID =
-        ESPUI.addControl(ControlType::Text, RDS_PI_CODE_STR, buff, ControlColor::Alizarin, rdsTab,
+        ESPUI.addControl(ControlType::Text, RDS_PI_CODE_STR, charBuff, ControlColor::Alizarin, rdsTab,
                          &setPiCodeCallback);
 
-    ESPUI.addControl(ControlType::Separator, RDS_RESET_SEP_STR, "", ControlColor::None, rdsTab);
+    sprintf(charBuff, "%u", rdsLocalPtyCode);
+    rdsPtyID =
+        ESPUI.addControl(ControlType::Number, RDS_PTY_CODE_STR, charBuff, ControlColor::Alizarin, rdsTab,
+                         &setPtyCodeCallback);
+    ESPUI.addControl(ControlType::Min,       "MIN",             String(RDS_PTY_CODE_MIN), ControlColor::None, rdsPtyID);
+    ESPUI.addControl(ControlType::Max,       "MAX",             String(RDS_PTY_CODE_MAX), ControlColor::None, rdsPtyID);
+
+    ESPUI.addControl(ControlType::Separator, RDS_RESET_SEP_STR, "",                       ControlColor::None, rdsTab);
 
     rdsRstID = ESPUI.addControl(ControlType::Button,
                                 RDS_RESET_STR,
@@ -1380,7 +1434,8 @@ void buildGUI(void)
     ctrlHttpID =
         ESPUI.addControl(ControlType::Switcher, CTRL_HTTP_STR, ctrlHttpFlg ? "1" : "0", ControlColor::Turquoise, ctrlTab,
                          &controllerCallback);
-    #endif
+    #endif // ifdef HTTP_ENB
+
     // ------------- END OF OPTIONAL HTTP CONTROLLER ------------------------
 
     ESPUI.addControl(ControlType::Separator, CTRL_LOCAL_SEP_STR, "", ControlColor::None, ctrlTab);
@@ -1406,14 +1461,14 @@ void buildGUI(void)
     // *****************
     // GPIO Tab
 
-    ESPUI.addControl(ControlType::Separator, GPIO_SETTINGS_STR, "", ControlColor::None, gpioTab);
+    ESPUI.addControl(ControlType::Separator, GPIO_SETTINGS_STR, "",              ControlColor::None, gpioTab);
     gpio19ID =
         ESPUI.addControl(ControlType::Select, GPIO_19_STR, gpio19BootStr, ControlColor::Dark, gpioTab, &gpioCallback);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_FT_STR, GPIO_INP_FT_STR, ControlColor::None, gpio19ID);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_PU_STR, GPIO_INP_PU_STR, ControlColor::None, gpio19ID);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_PD_STR, GPIO_INP_PD_STR, ControlColor::None, gpio19ID);
-    ESPUI.addControl(ControlType::Option, GPIO_OUT_LO_STR, GPIO_OUT_LO_STR, ControlColor::None, gpio19ID);
-    ESPUI.addControl(ControlType::Option, GPIO_OUT_HI_STR, GPIO_OUT_HI_STR, ControlColor::None, gpio19ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_FT_STR,   GPIO_INP_FT_STR, ControlColor::None, gpio19ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_PU_STR,   GPIO_INP_PU_STR, ControlColor::None, gpio19ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_PD_STR,   GPIO_INP_PD_STR, ControlColor::None, gpio19ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_OUT_LO_STR,   GPIO_OUT_LO_STR, ControlColor::None, gpio19ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_OUT_HI_STR,   GPIO_OUT_HI_STR, ControlColor::None, gpio19ID);
     gpio19MsgID = ESPUI.addControl(ControlType::Label, "GPIO_MSG", " ", ControlColor::None, gpio19ID);
 
     gpio23ID =
@@ -1427,14 +1482,14 @@ void buildGUI(void)
 
     gpio33ID =
         ESPUI.addControl(ControlType::Select, GPIO_33_STR, gpio33BootStr, ControlColor::Dark, gpioTab, &gpioCallback);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_FT_STR, GPIO_INP_FT_STR, ControlColor::None, gpio33ID);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_PU_STR, GPIO_INP_PU_STR, ControlColor::None, gpio33ID);
-    ESPUI.addControl(ControlType::Option, GPIO_INP_PD_STR, GPIO_INP_PD_STR, ControlColor::None, gpio33ID);
-    ESPUI.addControl(ControlType::Option, GPIO_OUT_LO_STR, GPIO_OUT_LO_STR, ControlColor::None, gpio33ID);
-    ESPUI.addControl(ControlType::Option, GPIO_OUT_HI_STR, GPIO_OUT_HI_STR, ControlColor::None, gpio33ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_FT_STR,   GPIO_INP_FT_STR, ControlColor::None, gpio33ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_PU_STR,   GPIO_INP_PU_STR, ControlColor::None, gpio33ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_INP_PD_STR,   GPIO_INP_PD_STR, ControlColor::None, gpio33ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_OUT_LO_STR,   GPIO_OUT_LO_STR, ControlColor::None, gpio33ID);
+    ESPUI.addControl(ControlType::Option,    GPIO_OUT_HI_STR,   GPIO_OUT_HI_STR, ControlColor::None, gpio33ID);
     gpio33MsgID = ESPUI.addControl(ControlType::Label, "GPIO_MSG", " ", ControlColor::None, gpio33ID);
 
-    ESPUI.addControl(ControlType::Separator, SAVE_SETTINGS_STR, "", ControlColor::None, gpioTab);
+    ESPUI.addControl(ControlType::Separator, SAVE_SETTINGS_STR, "",              ControlColor::None, gpioTab);
     gpioSaveID = ESPUI.addControl(ControlType::Button,
                                   SAVE_SETTINGS_STR,
                                   SAVE_SETTINGS_STR,

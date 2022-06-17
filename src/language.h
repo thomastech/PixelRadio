@@ -1,10 +1,9 @@
 /*
    File: language.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  MAR-12-2022
-   Public Release:
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -36,6 +35,8 @@
 #define ADJUST_TEST_STR       "TEST TONES"
 #define ADJUST_USB_VOL_STR    "USB VOLUME"
 
+#define AUDIO_TEST_STR    "PIXELRADIO AUDIO TEST"
+#define AUDIO_PSN_STR     "TestTone"  // RDS PSN for Audio Test Tone mode, Max 8 Chars.
 
 #define VGA_GAIN0_STR     "3dB"
 #define VGA_GAIN1_STR     "6dB"
@@ -138,7 +139,6 @@
 #define GPIO_HTTP_STR      "HTTP"
 #define GPIO_LOCAL_STR     "Local"
 
-
 #define HOME_CUR_TEXT_STR   "CURRENT RADIOTEXT"
 #define HOME_RDS_WAIT_STR   "Waiting for RDS RadioText ..."
 #define HOME_FM_SEP_STR     "FM RADIO STATUS"
@@ -206,6 +206,7 @@
 #define RDS_PI_CODE_STR       "PI CODE"
 #define RDS_PSN_DEF_STR       "PixeyFM"
 #define RDS_PROG_SERV_NM_STR  "PROGRAM SERVICE NAME"
+#define RDS_PTY_CODE_STR      "PTY CODE"
 #define RDS_RADIOTEXT1_STR    "LOCAL RADIOTEXT #1"
 #define RDS_RADIOTEXT2_STR    "LOCAL RADIOTEXT #2"
 #define RDS_RADIOTEXT3_STR    "LOCAL RADIOTEXT #3"

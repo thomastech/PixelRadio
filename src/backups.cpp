@@ -1,13 +1,12 @@
 /*
    File: backups.cpp (System Configuration Backup and Restore)
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-11-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -28,8 +27,7 @@
 // *************************************************************************************************************************
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
-#include <ArduinoLog.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include <SPI.h>
 #include <SD.h>
 #include "PixelRadio.h"
@@ -40,21 +38,24 @@
 const uint16_t JSON_CFG_SZ    = 2500;
 const uint16_t JSON_CRED_SIZE = 300;
 
+const char* sdTypeStr[] = {"Not Installed", "V1", "V2", "SDHC", "Unknown"};
+const uint8_t SD_TYPE_CNT = sizeof(sdTypeStr) / sizeof(sdTypeStr[0]);
+
 // *************************************************************************************************************************
 // checkEmergencyCredentials(): Restore credentials if credentials.txt is available. For use during boot.
 //                              Return true if Emergency credentials were restored.
 bool checkEmergencyCredentials(const char *fileName)
 {
     bool successFlg = true;
-
     File file;
+    SPIClass SPI2(HSPI);
 
-    SPI.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
+    SPI2.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
     pinMode(MISO_PIN, INPUT_PULLUP); // MISO requires internal pull-up.
     SD.end();                        // Reset interface (in case SD card had been swapped).
     spiSdCardShutDown();
 
-    if (!SD.begin(SD_CS_PIN)) {      // SD Card Missing, nothing to do, exit.
+    if (!SD.begin(SD_CS_PIN, SPI2)) {      // SD Card Missing, nothing to do, exit.
         SD.end();
         spiSdCardShutDown();
         return false;
@@ -68,7 +69,7 @@ bool checkEmergencyCredentials(const char *fileName)
         spiSdCardShutDown();
         return false;
     }
-
+    Log.infoln("-> SD Card Type: %s", SD.cardType() < SD_TYPE_CNT ? sdTypeStr[SD.cardType()] : "Error");
     file = SD.open(fileName, FILE_READ);
 
     StaticJsonDocument<JSON_CRED_SIZE> doc;
@@ -77,7 +78,7 @@ bool checkEmergencyCredentials(const char *fileName)
     file.close();
     SD.remove(fileName); // Erase File for security protection.
     SD.end();
-    //SPI.end();
+    //SPI2.end();
     spiSdCardShutDown();
 
     if (error) {
@@ -112,32 +113,33 @@ bool checkEmergencyCredentials(const char *fileName)
 }
 
 // *************************************************************************************************************************
-//saveConfiguration(): Save the System Configuration to LITTLEFS or SD Card.
+//saveConfiguration(): Save the System Configuration to LittleFS or SD Card.
 // SD Card Date Stamp is Jan-01-1980. Wasn't able to write actual time stamp because SDFat library conflicts with LITTLEFS.h.
 bool saveConfiguration(uint8_t saveMode, const char *fileName)
 {
     bool successFlg = false;
     File file;
+    SPIClass SPI2(HSPI);
 
     if (saveMode == LITTLEFS_MODE) {
-        Log.infoln("Backup Configuration to LITTLEFS ...");
-        LITTLEFS.remove(fileName);
-        file = LITTLEFS.open(fileName, FILE_WRITE);
+        Log.infoln("Backup Configuration to LittleFS ...");
+        LittleFS.remove(fileName);
+        file = LittleFS.open(fileName, FILE_WRITE);
     }
     else if (saveMode == SD_CARD_MODE) {
         Log.infoln("Backup Configuration to SD Card ...");
-        SPI.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
+        SPI2.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
         pinMode(MISO_PIN, INPUT_PULLUP); // MISO requires internal pull-up.
         SD.end();                        // Re-init Interface in case SD card had been swapped).
 
-        if (!SD.begin(SD_CS_PIN)) {
+        if (!SD.begin(SD_CS_PIN, SPI2)) {
             Log.errorln("-> SD Card failed Initialization, Aborted.");
             SD.end();
             spiSdCardShutDown();
             return false;
         }
-
-        //      SD.remove(fileName);
+        //SD.remove(fileName);
+        Log.infoln("-> SD Card Type: %s", SD.cardType() < SD_TYPE_CNT ? sdTypeStr[SD.cardType()] : "Error");
         file = SD.open(fileName, FILE_WRITE);
     }
     else {
@@ -194,6 +196,7 @@ bool saveConfiguration(uint8_t saveMode, const char *fileName)
     doc["WIFI_REBOOT_FLAG"] = WiFiRebootFlg;
 
     doc["RDS_PI_CODE"]        = rdsLocalPiCode; // Use radio.setPiCode() when restoring this hex value.
+    doc["RDS_PTY_CODE"]       = rdsLocalPtyCode;
     doc["RDS_LOCAL_MSG_TIME"] = rdsLocalMsgTime;
     doc["RDS_PROG_SERV_STR"]  = rdsLocalPsnStr;
     doc["RDS_TEXT1_ENB_FLAG"] = rdsText1EnbFlg;
@@ -257,27 +260,37 @@ bool saveConfiguration(uint8_t saveMode, const char *fileName)
 }
 
 // *************************************************************************************************************************
-// restoreConfiguration(): Restore configuration from local file system (LITTLEFS). On exit, return true if successful.
+// restoreConfiguration(): Restore configuration from local file system (LittleFS). On exit, return true if successful.
 bool restoreConfiguration(uint8_t restoreMode, const char *fileName)
 {
     File file;
+    SPIClass SPI2(HSPI);
 
     if (restoreMode == LITTLEFS_MODE) {
-        Log.infoln("Restore Configuration From LITTLEFS ...");
-        file = LITTLEFS.open(fileName, FILE_READ);
+        Log.infoln("Restore Configuration From LittleFS ...");
+        file = LittleFS.open(fileName, FILE_READ);
     }
     else if (restoreMode == SD_CARD_MODE) {
         Log.infoln("Restore Configuration From SD Card ...");
-        SPI.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
+        SPI2.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
+
         pinMode(MISO_PIN, INPUT_PULLUP); // MISO requires internal pull-up.
         SD.end();                        // Reset interface (in case SD card had been swapped).
 
-        if (!SD.begin(SD_CS_PIN)) {
+        if (!SD.begin(SD_CS_PIN, SPI2)) {
             Log.errorln("-> SD Card failed Initialization, Aborted.");
+            if(SD.cardType() == 0) {
+                Log.warningln("-> SD Card Missing.");
+            }
+            else {
+                Log.errorln("-> SD Card Unknown Error.");\
+            }
             SD.end();
             spiSdCardShutDown();
             return false;
         }
+
+        Log.infoln("-> SD Card Type: %s", SD.cardType() < SD_TYPE_CNT ? sdTypeStr[SD.cardType()] : "Error");
         file = SD.open(fileName, FILE_READ);
     }
     else {
@@ -405,6 +418,10 @@ bool restoreConfiguration(uint8_t restoreMode, const char *fileName)
 
     if (doc.containsKey("RDS_PI_CODE")) {
         rdsLocalPiCode = doc["RDS_PI_CODE"]; // Use radio.setPiCode() when restoring this hex value.
+    }
+
+    if (doc.containsKey("RDS_PTY_CODE")) {
+        rdsLocalPtyCode = doc["RDS_PTY_CODE"];
     }
 
     if (doc.containsKey("RDS_LOCAL_MSG_TIME")) {

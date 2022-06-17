@@ -1,13 +1,12 @@
 /*
    File: globals.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-18-2022
-   Public Release:
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022.
    Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
@@ -65,17 +64,23 @@ extern uint8_t fmRadioTestCode;
 extern uint8_t usbVol;
 
 extern uint16_t mqttPort;
+
+extern uint16_t rdsHttpPiCode;
 extern uint16_t rdsLocalPiCode;
 extern uint16_t rdsMqttPiCode;
-extern uint16_t rdsHttpPiCode;
 extern uint16_t rdsSerialPiCode;
 
+extern uint8_t  rdsHttpPtyCode;
+extern uint8_t  rdsLocalPtyCode;
+extern uint8_t  rdsMqttPtyCode;
+extern uint8_t  rdsSerialPtyCode;
+
 extern uint32_t baudRate;
-extern int32_t rdsHttpMsgTime;
-extern int32_t rdsLocalMsgTime;
-extern int32_t rdsMqttMsgTime;
-extern int32_t rdsSerialMsgTime;
-extern int32_t rdsMsgTime;
+extern uint32_t rdsHttpMsgTime;
+extern uint32_t rdsLocalMsgTime;
+extern uint32_t rdsMqttMsgTime;
+extern uint32_t rdsSerialMsgTime;
+extern uint32_t rdsMsgTime;
 
 extern uint16_t fmFreqX10;
 extern float vbatVolts;

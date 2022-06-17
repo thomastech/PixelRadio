@@ -1,13 +1,12 @@
 /*
-   File: littlefs.cpp
+   File: fileSys.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Feb-11-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -45,7 +44,7 @@
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include <SPI.h>
 #include <SD.h>
 #include "config.h"
@@ -60,8 +59,9 @@ void instalLogoImageFile(void) {
     char logBuff[60 + sizeof(LOGO_GIF_NAME)];
     int16_t sdcFileSize;
     int16_t lfsFileSize;
+    SPIClass SPI2(HSPI);
 
-    if (LITTLEFS.exists(LOGO_GIF_NAME)) {
+    if (LittleFS.exists(LOGO_GIF_NAME)) {
         sprintf(logBuff, "Found \"%s\" Logo Image in File System.", LOGO_GIF_NAME);
         Log.verboseln(logBuff);
         return;
@@ -70,11 +70,11 @@ void instalLogoImageFile(void) {
     sprintf(logBuff, "Logo Gif File (%s) is Missing. Will Load it From the SD Card.", LOGO_GIF_NAME);
     Log.errorln(logBuff);
 
-    SPI.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
+    SPI2.begin(SD_CLK_PIN, MISO_PIN, MOSI_PIN, SD_CS_PIN);
     pinMode(MISO_PIN, INPUT_PULLUP); // MISO requires internal pull-up.
     SD.end();                        // Reset interface (in case SD card had been swapped).
 
-    if (!SD.begin(SD_CS_PIN)) {
+    if (!SD.begin(SD_CS_PIN, SPI2)) {
         SD.end();
         spiSdCardShutDown();
 
@@ -107,14 +107,14 @@ void instalLogoImageFile(void) {
 
     //lfsImageFile.close();
     File    lfsImageFile; // LittleFS Image File.
-    lfsImageFile = LITTLEFS.open(LOGO_GIF_NAME, FILE_WRITE);
+    lfsImageFile = LittleFS.open(LOGO_GIF_NAME, FILE_WRITE);
 
     while (sdcImageFile.available()) {
         char data = sdcImageFile.read();
         lfsImageFile.print(data);
     }
     lfsImageFile.close();
-    lfsImageFile = LITTLEFS.open(LOGO_GIF_NAME, FILE_READ);
+    lfsImageFile = LittleFS.open(LOGO_GIF_NAME, FILE_READ);
     lfsFileSize  = lfsImageFile.size();
 
 /*  // DEBUG ONLY
@@ -150,20 +150,20 @@ void littlefsInit(void)
     const char   *content1 = "  This text was written to LittleFS because the Filesystem is missing\r\n";
     const char   *content2 = "  >> If you see this message then please Upload the Filesystem Image <<";
 
-    if (!LITTLEFS.begin(true)) { // true=Format on fail.
+    if (!LittleFS.begin(true)) { // true=Format on fail.
         Log.errorln("LittleFS: An Error has occurred while mounting File System");
     }
     else {
         Log.infoln("LittleFS: Mounted File System, testing ...");
 
-        sprintf(logBuff, "-> Total Size: %u bytes", LITTLEFS.totalBytes());
+        sprintf(logBuff, "-> Total Size: %u bytes", LittleFS.totalBytes());
         Log.verboseln(logBuff);
-        sprintf(logBuff, "-> Total Used: %u bytes", LITTLEFS.usedBytes());
+        sprintf(logBuff, "-> Total Used: %u bytes", LittleFS.usedBytes());
         Log.verboseln(logBuff);
-        sprintf(logBuff, "-> Total Free: %u bytes", LITTLEFS.totalBytes() - LITTLEFS.usedBytes());
+        sprintf(logBuff, "-> Total Free: %u bytes", LittleFS.totalBytes() - LittleFS.usedBytes());
         Log.verboseln(logBuff);
 
-        File file1 = LITTLEFS.open("/test.txt", FILE_READ);
+        File file1 = LittleFS.open("/test.txt", FILE_READ);
 
         if (!file1) {
             filesz = 0;
@@ -176,7 +176,7 @@ void littlefsInit(void)
         }
 
         if (filesz == 0) {
-            file1 = LITTLEFS.open("/test.txt", FILE_WRITE);
+            file1 = LittleFS.open("/test.txt", FILE_WRITE);
 
             if (!file1) {
                 Log.errorln("-> There was an error opening the test.txt file for writing");
@@ -205,7 +205,7 @@ void littlefsInit(void)
 
         // Let's read the test.txt file from LittleFS.
         // Data files like this one should be uploaded to the Filesystem Image, see comment section at top of file.
-        File file2 = LITTLEFS.open("/test.txt", FILE_READ);
+        File file2 = LittleFS.open("/test.txt", FILE_READ);
 
         if (!file2)
         {
@@ -239,12 +239,12 @@ const String makeWebGif(String fileName, uint16_t width, uint16_t height, String
     String   imageStr;
 
     imageStr.clear();
-    File imageFile = LITTLEFS.open(fileName, FILE_READ);
+    File imageFile = LittleFS.open(fileName, FILE_READ);
 
     if (!imageFile) {
         sprintf(logBuff, "-> makeWebGif: Error opening Image file (%s)", fileName.c_str());
         Log.warningln(logBuff);
-        Log.warningln("-> LITTLEFS Filesystem is Missing, YOU Need to Upload it.");
+        Log.warningln("-> LittleFS Filesystem is Missing, YOU Need to Upload it.");
         imageStr.clear();
         imageStr.reserve(13);
         imageStr = "IMAGE FILE MISSING";

@@ -1,13 +1,12 @@
 /*
    File: rds.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-08-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this
    license absolutely no warranty is given.
@@ -127,12 +126,12 @@ bool checkControllerRdsAvail(void) {
 //               A round robbin scheduler is used and user can select which messages to show.
 void processRDS(void) {
     char logBuff[75 + RDS_TEXT_MAX_SZ];
-    static uint8_t loop      = 0;
-    int32_t currentMillis    = 0;
-    static int32_t rdsMillis = 0;     // Timer for RDS Web GUI updates.
-    static int32_t cntMillis = 0;     // Timer for ICStation FM Tx services.
-    static String  rdsRefreshPsnStr;
-    static String  rdsRefreshTextStr; // RadioText Refresh, Message to repeat.
+    static uint8_t loop       = 0;
+    uint32_t currentMillis    = 0;
+    static uint32_t rdsMillis = 0;     // Timer for RDS Web GUI updates.
+    static uint32_t cntMillis = 0;     // Timer for ICStation FM Tx services.
+    static String   rdsRefreshPsnStr;
+    static String   rdsRefreshTextStr; // RadioText Refresh, Message to repeat.
 
     rdsRefreshPsnStr.reserve(10);
     rdsRefreshTextStr.reserve(70);
@@ -196,7 +195,10 @@ void processRDS(void) {
             rdsMsgTime        = rdsSerialMsgTime;
             rdsMillis         = currentMillis;
 
-            radio.setPiCode(rdsSerialPiCode); // Set Serial Controller's Pi Code.
+            sprintf(logBuff, "Serial Controller RDS Will Use: PI=0x%04X, PTY=%u.", rdsSerialPiCode, rdsSerialPtyCode);
+            Log.infoln(logBuff);
+            radio.setPiCode(rdsSerialPiCode);   // Set Serial Controller's Pi Code.
+            radio.setPtyCode(rdsSerialPtyCode); // Set Serial Controller's PTY Code.
 
             sprintf(logBuff, "Serial Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -220,7 +222,10 @@ void processRDS(void) {
             rdsMsgTime        = rdsMqttMsgTime;
             rdsMillis         = currentMillis;
 
-            radio.setPiCode(rdsMqttPiCode); // Set MQTT Controller's Pi Code.
+            sprintf(logBuff, "MQTT Controller RDS Will Use: PI=0x%04X, PTY=%u.", rdsMqttPiCode, rdsMqttPtyCode);
+            Log.infoln(logBuff);
+            radio.setPiCode(rdsMqttPiCode);   // Set MQTT Controller's Pi Code.
+            radio.setPtyCode(rdsMqttPtyCode); // Set MQTT Controller's PTY Code.
 
             sprintf(logBuff, "MQTT Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -237,12 +242,15 @@ void processRDS(void) {
             activeTextHttpFlg  = true;
             activeTextLocalFlg = false;         // Clear lower priority Controller.
 
-            rdsRefreshPsnStr  =  rdsHttpPsnStr; // Program Service Name.
+            rdsRefreshPsnStr  = rdsHttpPsnStr;  // Program Service Name.
             rdsRefreshTextStr = rdsHttpTextStr; // RadioText Message.
             rdsMsgTime        = rdsHttpMsgTime;
             rdsMillis         = currentMillis;
 
-            radio.setPiCode(rdsHttpPiCode); // Set HTTP Controller's Pi Code.
+            sprintf(logBuff, "HTTP Controller RDS Will Use: PI=0x%04X, PTY=%u.", rdsHttpPiCode, rdsHttpPtyCode);
+            Log.infoln(logBuff);
+            radio.setPiCode(rdsHttpPiCode);   // Set HTTP Controller's Pi Code.
+            radio.setPtyCode(rdsHttpPtyCode); // Set HTTP Controller's PTY Code.
 
             sprintf(logBuff, "HTTP Controller Sending RDS Program Service Name (%s)", rdsRefreshPsnStr.c_str());
             Log.infoln(logBuff);
@@ -309,7 +317,10 @@ void processRDS(void) {
         rdsMsgTime         = rdsLocalMsgTime;
         rdsRefreshPsnStr   = rdsLocalPsnStr;
 
-        radio.setPiCode(rdsLocalPiCode); // Set Local Controller's Pi Code.
+        sprintf(logBuff, "Local Controller RDS Will Use: PI=0x%04X, PTY=%u.", rdsLocalPiCode, rdsLocalPtyCode);
+        Log.infoln(logBuff);
+        radio.setPiCode(rdsLocalPiCode);   // Set Local Controller's PI Code.
+        radio.setPtyCode(rdsLocalPtyCode); // Set Local Controller's PTY Code.
 
         sprintf(logBuff, "Local Controller Sending RDS Station Name (%s).", rdsLocalPsnStr.c_str());
         Log.infoln(logBuff);
@@ -401,24 +412,28 @@ void processRDS(void) {
 void resetControllerRdsValues(void)
 {
     // Local RDS Controller
-    radio.setPiCode(rdsLocalPiCode);    // Local RDS PI Code is Fixed Value.
+    radio.setPiCode(rdsLocalPiCode);    // Default RDS PI Code.
+    radio.setPtyCode(rdsLocalPtyCode);  // Default RDS PTY Code.
 
     // USB Serial RDS Controller. All values can be changed during runtime by Serial Commands.
     rdsSerialPsnStr  = rdsLocalPsnStr;  // Default Program Service Name (Mimic Local Controller).
     rdsSerialTextStr = "";              // Clear Controller's RadioText Message.
     rdsSerialPiCode  = rdsLocalPiCode;  // Default PI Code (Mimic Local Controller).
+    rdsSerialPtyCode = rdsLocalPtyCode; // Default PTY Code (Mimic Local Controller).
     rdsSerialMsgTime = rdsLocalMsgTime; // Default RDS Message Time (Mimic Local Controller),
 
     // MQTT RDS Controller. All values can be changed during runtime by MQTT Commands.
     rdsMqttPsnStr  = rdsLocalPsnStr;    // Default Program Service Name (Mimic Local Controller).
     rdsMqttTextStr = "";                // Clear Controller's RadioText Message.
     rdsMqttPiCode  = rdsLocalPiCode;    // Default PI Code (Mimic Local Controller).
+    rdsMqttPtyCode = rdsLocalPtyCode;   // Default PTY Code (Mimic Local Controller).
     rdsMqttMsgTime = rdsLocalMsgTime;   // Default RDS Message Time (Mimic Local Controller),
 
     // HTTP RDS Controller. All values can be changed during runtime by HTTP Commands.
     rdsHttpPsnStr  = rdsLocalPsnStr;    // Default Program Service Name (Mimic Local Controller).
     rdsHttpTextStr = "";                // Clear Controller's RadioText Message.
     rdsHttpPiCode  = rdsLocalPiCode;    // Default PI Code (Mimic Local Controller).
+    rdsHttpPtyCode = rdsLocalPtyCode;   // Default PTY Code (Mimic Local Controller).
     rdsHttpMsgTime = rdsLocalMsgTime;   // Default RDS Message Time (Mimic Local Controller),
 }
 

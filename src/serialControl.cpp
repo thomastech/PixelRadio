@@ -1,13 +1,12 @@
 /*
    File: serialControl.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-10-2022
-   Public Release:
-   Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Revised:  Jun-13-2022
    Revision History: See PixelRadio.cpp
+   Project Leader: T. Black (thomastech)
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this
    license absolutely no warranty is given.
@@ -216,6 +215,15 @@ void serialCommands(void)
             }
             serial_manager.println(printBuff);
         }
+        else if (cmdStr == CMD_PTYCODE_STR) {
+            if (ptyCodeCmd(paramStr, SERIAL_CNTRL)) {
+                sprintf(printBuff, "{\"%s\": \"ok\"}", CMD_PTYCODE_STR);
+            }
+            else {
+                sprintf(printBuff, "{\"%s\": \"fail\"}", CMD_PTYCODE_STR);
+            }
+            serial_manager.println(printBuff);
+        }
         else if (cmdStr == CMD_PSN_STR) {
             if (programServiceNameCmd(paramStr, SERIAL_CNTRL)) {
                 sprintf(printBuff, "{\"%s\": \"ok\"}", CMD_PSN_STR);
@@ -231,6 +239,15 @@ void serialCommands(void)
             }
             else {
                 sprintf(printBuff, "{\"%s\": \"fail\"}", CMD_RADIOTEXT_STR);
+            }
+            serial_manager.println(printBuff);
+        }
+        else if (cmdStr == CMD_RF_CARRIER_STR) {
+            if (rfCarrierCmd(paramStr, SERIAL_CNTRL)) {
+                sprintf(printBuff, "{\"%s\": \"ok\"}", CMD_RF_CARRIER_STR);
+            }
+            else {
+                sprintf(printBuff, "{\"%s\": \"fail\"}", CMD_RF_CARRIER_STR);
             }
             serial_manager.println(printBuff);
         }

@@ -48,6 +48,8 @@ The Serial, MQTT, and HTTP controllers share the same command keywords.
 | **pic** | *0x00ff - 0xffff* | RDS Program ID Code (hex) | pic=0x6401 |
 | **rtper** | *5 - 900* |RDS Time Period (seconds)| rtper=45 |
 | **psn** | *<8 characters max>* | RDS Program Service Name | psn=BOO2U |
+| **pty** | *0 - 29* | RDS PTY Code | pty=9 |
+| **rfc** |  *on : off* | RF Carrier Control | rfc=on |
 | **rtm** | *<64 characters max>* | RDS RadioText Message | rtm=We have Ghosts and Halloween Candy! |
 | **start** | *rds* | RDS Start / Restart | start=rds |
 | **stop** | *rds* | RDS Stop | stop=rds |
@@ -57,6 +59,10 @@ The Serial, MQTT, and HTTP controllers share the same command keywords.
 The RDS related commands are encapsulated.
 For example, if a controller changes its RadioText message it will not affect the RadioText created by the other controllers.
 This characteristic is shared by the RDS specific commands.
+
+Whenever **any** RDS command is received the controller will be updated with the new value.
+It then automatically starts sending the currently loaded RadioText message.
+This intentional behavior helps reduce command traffic because it eliminates the need to issue a ``Start RDS`` command.
 
 ---
 
@@ -260,6 +266,14 @@ For example, to set the `Audio` mode use this URL: \
 `http://pixelradio.local:8080/cmd?aud=stereo`
 >NOTE: It may be necessary to use the device's IP address instead of the mDNS name. Example:\
 >`http://192.168.1.37:8080.cmd?rtper=30`
+
+It will be necessary to use HTTP *Percent Encoding* formatting on some characters sent by the Program Service Name (`psn`) and RadioText Message (`rtm`) commands.
+For example, in order to see the plus sign (+) character it must be sent as ``%2B``.
+Otherwise this character will be a blank space on the RDS receiver's display.
+
+There are other non-alphanumeric characters that need this treatment too.
+When necessary, change them to their Percent Encoded value listed in <a href="https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding" target="_blank">this table</a>.
+The allowable values are hex based and must be in the range of %20 and %7E.
 
 ## HTTP CONTROLLER EXAMPLE
 

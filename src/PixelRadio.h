@@ -1,13 +1,12 @@
 /*
    File: PixelRadio.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Apr-06-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license
    absolutely no warranty is given.
@@ -26,9 +25,9 @@
 // *********************************************************************************************
 // VERSION STRING: Must be updated with each public release.
 // The version is shown during boot on Serial Log and on the "About" UI web Tab page.
-#define VERSION_STR       "1.0"
+#define VERSION_STR       "1.1.0"
 #define AUTHOR_STR        "by Thomas Black"
-#define BLD_DATE_STR      "Apr-05-2022"
+#define BLD_DATE_STR      "Jun-13-2022"
 #define GITHUB_REPO_STR   "<a href=\"https://github.com/thomastech/PixelRadio/\" target=\"_blank\">Click Here for Information</a>"
 
 // *********************************************************************************************
@@ -46,8 +45,10 @@ const uint8_t CMD_GPIO_MAX_SZ = 7;  // GPIO Cmd Code max length is 7 ("input/inp
 const uint8_t CMD_LOG_MAX_SZ  = 7;  // Serial Log Level Arg max length is 7 ("silent" / "restore");
 const uint8_t CMD_MUTE_MAX_SZ = 3;  // MUTE Command Arg max length is 3 ("on" / "off").
 const uint8_t CMD_PI_MAX_SZ   = 7;  // PI Command Arg max length is 6 (Examples, "ffff" and/or "0xffff"). Add +1 to trap typos.
+const uint8_t CMD_PTY_MAX_SZ  = 3;  // PTY Command Arg max length is 3 (Example, "10" or "010").
 const uint8_t CMD_PSN_MAX_SZ  = 8;  // PSN Command Arg max length for Program Service Name.
 const uint8_t CMD_RDS_MAX_SZ  = 3;  // RDS Control Cmd Code length is 3 ("rds").
+const uint8_t CMD_RF_MAX_SZ   = 3;  // RF Carrier Cmd Arg max length (Example "on" or "off").
 const uint8_t CMD_RT_MAX_SZ   = 64; // RT Command Arg max Length for RadioText.
 const uint8_t CMD_SYS_MAX_SZ  = 6;  // System Cmd Code length is 6 ("system").
 const uint8_t CMD_TIME_MAX_SZ = 4;  // Time Command Arg length is 3 (5-900). Add +1 to trap typos.
@@ -57,17 +58,21 @@ const uint8_t CMD_TIME_MAX_SZ = 4;  // Time Command Arg length is 3 (5-900). Add
 #define CMD_GPIO_OUT_LOW_STR  "outlow"
 #define CMD_GPIO_READ_STR     "read"
 
-#define CMD_MODE_MONO_STR  "mono"
-#define CMD_MODE_STER_STR  "stereo"
-
-#define CMD_MUTE_OFF_STR   "off"
-#define CMD_MUTE_ON_STR    "on"
-
 #define CMD_LOG_RST_STR    "restore"
 #define CMD_LOG_SIL_STR    "silent"
 
-#define CMD_RDS_CODE_STR   "rds"
-#define CMD_SYS_CODE_STR   "system"
+#define CMD_MODE_MONO_STR  "mono"
+#define CMD_MODE_STER_STR  "stereo"
+
+#define CMD_MUTE_OFF_STR  "off"
+#define CMD_MUTE_ON_STR   "on"
+
+#define CMD_RDS_CODE_STR  "rds"
+
+#define CMD_RF_OFF_STR    "off"
+#define CMD_RF_ON_STR     "on"
+
+#define CMD_SYS_CODE_STR  "system"
 
 // Controller Command Keywords
 #define  CMD_AUDMODE_STR     "aud"    // Radio Stereo / Mono Audio Mode.
@@ -80,8 +85,10 @@ const uint8_t CMD_TIME_MAX_SZ = 4;  // Time Command Arg length is 3 (5-900). Add
 #define  CMD_MUTE_STR        "mute"   // Radio Audio Mute, On/Off.
 #define  CMD_PERIOD_STR      "rtper"  // RadioText Display Time Period, in seconds.
 #define  CMD_PICODE_STR      "pic"    // RDS Program Information Code.
+#define  CMD_PTYCODE_STR     "pty"    // RDS PTY Code.
 #define  CMD_PSN_STR         "psn"    // RadioText Program Service Name, 8 chars max.
 #define  CMD_REBOOT_STR      "reboot" // Reboot System.
+#define  CMD_RF_CARRIER_STR  "rfc"    // RF Carrier, On/Off.
 #define  CMD_RADIOTEXT_STR   "rtm"    // RadioText Message, 64 chars max.
 #define  CMD_START_STR       "start"  // Start RDS using existing HTTP settings.
 #define  CMD_STOP_STR        "stop"   // Stop HTTP Controller's RDS Transmission.
@@ -161,9 +168,8 @@ const uint16_t FM_FREQ_SKP_KHZ = 1;      // 100Khz.
 const uint16_t FM_FREQ_SKP_MHZ = 10;     // 1MHz.
 
 // FM Radio RF
-const float PA_VOLT_MIN         = 8.1f;  // Minimum allowed voltage for Power Amp, 9V -10%.
-const float PA_VOLT_MAX         = 9.9f;  // Maximum allowed voltage for Power Amp, 9V + 10%.
-
+const float PA_VOLT_MIN = 8.1f;          // Minimum allowed voltage for Power Amp, 9V -10%.
+const float PA_VOLT_MAX = 9.9f;          // Maximum allowed voltage for Power Amp, 9V + 10%.
 // Free Memory
 const uint32_t FREE_MEM_UPD_TIME = 1750; // Update time for Free Memory (on diagTab), in mS.
 
@@ -244,16 +250,19 @@ const uint8_t  RF_MED_POWER    = 40;              // 96dBuV.
 const uint8_t  RF_HIGH_POWER   = 78;              // 119dBuV. Do Not change.
 
 // RDS:
-const int16_t  RDS_DSP_TM_MAX   = 900;            // Maximum RadioText Display Period, in secs.
-const int16_t  RDS_DSP_TM_MIN   = 5;              // Minimum RadioText Display Period, in secs.
-const int32_t  RDS_DSP_TM_DEF   = 15000;          // Default Radio Display Period, in mS.
+const uint16_t RDS_DSP_TM_MAX   = 900;            // Maximum RadioText Display Period, in secs.
+const uint16_t RDS_DSP_TM_MIN   = 5;              // Minimum RadioText Display Period, in secs.
+const uint32_t RDS_DSP_TM_DEF   = 15000;          // Default Radio Display Period, in mS.
 const uint16_t RDS_MSG_UPD_TIME = 1000;           // RadioText UI Update Time, im mS.
-const uint16_t RDS_PI_CODE_DEF  = 0x6400;         // Default RDS PI Code, 16-bit hex value.
+const uint16_t RDS_PI_CODE_DEF  = 0x6400;         // Default RDS PI Code, 16-bit hex value, 0x00ff - 0xffff.
 const uint32_t RDS_PI_CODE_MAX  = 0xffff;         // Maximum PI Code Value (hex).
 const uint32_t RDS_PI_CODE_MIN  = 0x00ff;         // Minumum PI Code Value (hex).
 const uint8_t  RDS_PSN_MAX_SZ   = CMD_PSN_MAX_SZ; // RDS Program Service Name, Max Allowed Length.
-const uint8_t  RDS_TEXT_MAX_SZ  = CMD_RT_MAX_SZ;  // RDS RadioText Message, Max Allowed Length.
+const uint8_t  RDS_PTY_CODE_DEF = 9;              // Default RDS PTY Code "Top 40", 0-29 allowed.
+const uint8_t  RDS_PTY_CODE_MIN = 0;              // Min RDS PTY Code "None", See https://en.wikipedia.org/wiki/Radio_Data_System
+const uint8_t  RDS_PTY_CODE_MAX = 29;             // Max RDS PTY Code "Weather".
 const uint8_t  RDS_REFRESH_TM   = 5;              // RadioText Refresh Time, in Seconds.
+const uint8_t  RDS_TEXT_MAX_SZ  = CMD_RT_MAX_SZ;  // RDS RadioText Message, Max Allowed Length.
 
 // RSSI:
 const uint16_t RSSI_UPD_TIME = 2500;              // RSSI GUI Update time (on homeTab), in mS.
@@ -264,6 +273,13 @@ const uint16_t RSSI_UPD_TIME = 2500;              // RSSI GUI Update time (on ho
 // Test Tone
 const uint8_t  TEST_TONE_CHNL = 0;                // Test Tone PWM Channel.
 const uint32_t TEST_TONE_TIME = 300;              // Test Tone Sequence Time, in mS.
+const uint16_t TONE_A3        = 220;              // 220Hz Audio Tone.
+const uint16_t TONE_A4        = 440;
+const uint16_t TONE_C4        = 262;
+const uint16_t TONE_C5        = 523;
+const uint16_t TONE_E4        = 330;
+const uint16_t TONE_F4        = 349;
+const uint16_t TONE_NONE      = 0;
 
 // Time Conversion
 const uint32_t MSECS_PER_SEC = 1000UL;
@@ -351,6 +367,8 @@ bool    muteCmd(String  payloadStr,
                 uint8_t controller);
 bool    piCodeCmd(String  payloadStr,
                   uint8_t controller);
+bool    ptyCodeCmd(String  payloadStr,
+                   uint8_t controller);
 bool    programServiceNameCmd(String  payloadStr,
                               uint8_t Controller);
 bool    radioTextCmd(String  payloadStr,
@@ -359,6 +377,8 @@ bool    rdsTimePeriodCmd(String  payloadStr,
                          uint8_t controller);
 bool    rebootCmd(String  payloadStr,
                   uint8_t controller);
+bool    rfCarrierCmd(String  payloadStr,
+                     uint8_t controller);
 bool    startCmd(String  payloadStr,
                  uint8_t controller);
 bool    stopCmd(String  payloadStr,
@@ -380,11 +400,14 @@ void   updateUiFrequency(void);
 bool   updateUiGpioMsg(uint8_t pin,
                        uint8_t controller);
 void   updateUiIpaddress(String ipStr);
+void   updateUiLocalMsgTime(void);
 void   updateUiLocalPiCode(void);
+void   updateUiLocalPtyCode(void);
 void   updateUiRdsText(String textStr);
-void   updateUiRDSTmr(int32_t rdsMillis);
+void   updateUiRDSTmr(uint32_t rdsMillis);
+void   updateUiRfCarrier(void);
 void   updateUiRSSI(void);
-void   updateUiTimer(void);
+void   updateUiDiagTimer(void);
 void   updateUiVolts(void);
 void   updateUiWfiMode(void);
 
@@ -448,6 +471,8 @@ void   setMqttNameCallback(Control *sender,
 
 void setPiCodeCallback(Control *sender,
                        int      type);
+void setPtyCodeCallback(Control *sender,
+                        int      type);
 void setWiFiAuthenticationCallback(Control *sender,
                                    int      type);
 void setWiFiNamesCallback(Control *sender,
@@ -491,6 +516,13 @@ uint8_t      i2cScanner(void);
 void         rebootSystem(void);
 void         setGpioBootPins(void);
 void         spiSdCardShutDown(void);
+bool         strIsUint(String intStr);
+void         toneInit(void);
+void         toneOn(uint8_t  pin,
+                    uint16_t freq,
+                    uint8_t  channel);
+void         toneOff(uint8_t pin,
+                     uint8_t channel);
 void         updateGpioBootPins(void);
 void         updateTestTones(bool resetTimerFlg);
 
@@ -557,6 +589,8 @@ bool         wifiConnect(void);
 void         wifiReconnect(void);
 String       getWifiModeStr(void);
 String       IpAddressToString(const IPAddress& ipAddress);
+String       urlDecode(String urlStr);
+uint8_t      urlDecodeHex(char c);
 IPAddress    convertIpString(String ipStr);
 
 // *********************************************************************************************

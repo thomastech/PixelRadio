@@ -1,13 +1,12 @@
 /*
    File: radio.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Mar-30-2022
-   Public Release:
+   Revised:  Jun-13-2022
+   Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
-   Revision History: See PixelRadio.cpp
 
    (c) copyright T. Black 2021-2022, Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
@@ -33,7 +32,7 @@ extern QN8027Radio radio;
 bool calibrateAntenna(void)
 {
     bool successFlg = true;
-    char logBuff[70];
+    char logBuff[85];
     uint8_t regVal1;
     uint8_t regVal2;
 
@@ -64,13 +63,17 @@ bool calibrateAntenna(void)
     sprintf(logBuff, "-> QN8027 RF Port Test: Low RF Range= 0x%02X, High RF Range= 0x%02X", regVal1, regVal2);
     Log.verboseln(logBuff);
 
-    if ((regVal1 <= 0x01) || (regVal1 >= 0x1f) || (regVal2 <= 0x01) || (regVal2 >= 0x1f)) {
+    if (regVal1 == 0x00 && regVal2 == 0x00) {
         successFlg = false;
-        Log.errorln("-> QN8027 RF Port Matching Poor, RF Tuning Range Impaired.");
+        Log.errorln("-> QN8027 RF Port Calibration Failed, Possible Oscillator Failure.");
+    }
+    else if ((regVal1 <= 0x01) || (regVal1 >= 0x1f) || (regVal2 <= 0x01) || (regVal2 >= 0x1f)) {
+        successFlg = false;
+        Log.errorln("-> QN8027 RF Port has Poor Calibration, RF Tuning Range Impaired.");
     }
     else {
         successFlg = true;
-        Log.infoln("-> QN8027 RF Port Matching OK");
+        Log.infoln("-> QN8027 RF Port Matching OK, Calibration Successful.");
     }
 
     /*
@@ -318,6 +321,7 @@ uint8_t initRadioChip(void) {
     Log.infoln(logBuff);
 
     radio.setPiCode(rdsLocalPiCode);
+    radio.setPtyCode(rdsLocalPtyCode);
 
     if (successFlg) {
         Log.infoln("-> QN8027 Initialization Complete.");

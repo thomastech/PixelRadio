@@ -1,24 +1,40 @@
 /*
    File: PixelRadio.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.0
+   Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Apr-05-2022
-   Public Release:
+   Revised:  Jun-13-2022
    Project Leader: T. Black (thomastech)
-   Contributors: thomastech
+   Contributors: thomastech, dkulp
 
    (c) copyright T. Black 2021-2022.
    Licensed under GNU GPL 3.0 and later, under this license absolutely no warranty is given.
    This Code was formatted with the uncrustify extension.
 
    Revision History:
-   V0.0,  Dec-16-2021: Started Project.
-   V0.1,  Jan-20-2022: Updated to ESP32UI PR#149 (Jan-20-2022 build). Resolved ongoing ESPUI Issues.
-   V0.2,  Jan-28-2022: Migrated Hardware, ICStation FM Transmitter Board changed to basic QN8027 I2C Module.
-   V0.3,  Feb-04-2022: Updated platformio/espressif32 3.4.0 to 3.5.0.
-   V1.0B, Feb-28-2022: Non-public beta release by thomastech.
-   V1.0,  Apr-05-2022: First Public Release.
+   V0.0,   Dec-16-2021: Started Project.
+   V0.1,   Jan-20-2022: Updated to ESP32UI PR#149 (Jan-20-2022 build). Resolved ongoing ESPUI Issues.
+   V0.2,   Jan-28-2022: Migrated Hardware, ICStation FM Transmitter Board changed to basic QN8027 I2C Module.
+   V0.3,   Feb-04-2022: Updated platformio/espressif32 3.4.0 to 3.5.0.
+   V1.0B,  Feb-28-2022: Non-public beta release by thomastech.
+   V1.0,   Apr-05-2022: First Public Release.
+   V1.1.0, Jun-13-2022: Updated espressif32 platform to 4.4.0, was 3.5.0. Core now 6.0.2, was 5.2.5
+                        PlatformIO Package = framework-arduinoespressif32 3.20003.0 (2.0.3).
+                        Updated ArduinoJson to 6.19.4, was 6.19.1
+                        Updated LittleFS to 2.0.0 (built-in), was 1.0.6.
+                        Changed platformio.ini board type to ttgo-t1, was esp32dev.
+                        Added PTY (Program Type) command to HTTP, MQTT, and Serial Controllers (dkulp submission).
+                        Added programmable Local Controller PTY code to Web UI (on Local RDS Tab).
+                        Added RF Carrier On/Off to the Controller API.
+                        Fixed 49 day System Run Time hang.
+                        Fixed Web UI's displayed IP Address so it updates on reconnects.
+                        Added test for broken QN8027 Oscillator (post failure to serial log).
+                        Updated test tone routine for compatibility with latest espressif32 + removed blocking code.
+                        Corrected millis var type (found some that were int32, must be uint32).
+                        Added Percent (%) Decoding to HTTP API's URL.
+                        Performed misc code cleanup.
+                        Updated Readme documentation, added photos for external WiFi antenna modification.
+                        -> Validation completed on Jun-17-2022, public release approved.
 
    Notes:
    1. This "Arduino" project must be compiled with VSCode / Platformio. Do not use the Arduino IDE.
@@ -52,63 +68,69 @@
 // ************************************************************************************************
 // Global Section
 //
-QN8027Radio radio = QN8027Radio();          // FM Transmitter Module (QN8027 radio)
+QN8027Radio radio = QN8027Radio();           // FM Transmitter Module (QN8027 radio)
 
 // Global System Vars
-bool activeTextHttpFlg   = false;           // HTTP Controller Is Sending RadioText if true.
-bool activeTextLocalFlg  = false;           // Local Controller Is Sending RadioText if true.
-bool activeTextMqttFlg   = false;           // MQTT Controller Is Sending RadioText if true.
-bool activeTextSerialFlg = false;           // Serial Controller Is Sending RadioText if true.
+bool activeTextHttpFlg   = false;            // HTTP Controller Is Sending RadioText if true.
+bool activeTextLocalFlg  = false;            // Local Controller Is Sending RadioText if true.
+bool activeTextMqttFlg   = false;            // MQTT Controller Is Sending RadioText if true.
+bool activeTextSerialFlg = false;            // Serial Controller Is Sending RadioText if true.
 
-bool mqttOnlineFlg   = false;               // MQTT is online if true.
-bool newAutoRfFlg    = false;               // new RF Auto Off Setting Avail Semaphore.
-bool newCarrierFlg   = false;               // New Carrier Settings Avail Semaphore.
-bool newDigGainFlg   = false;               // New Digital Audio Gain Setting Avail Semaphore.
-bool newGpio19Flg    = false;               // New GPIO Pin 19 State.
-bool newGpio23Flg    = false;               // New GPIO Pin 23 State.
-bool newGpio33Flg    = false;               // New GPIO Pin 33 State.
-bool newFreqFlg      = false;               // New Radio Frequency Setting Avail Semaphore.
-bool newInpImpFlg    = false;               // New Input Impedance Setting Avail Semaphore.
-bool newAudioModeFlg = false;               // New Mono/Stereo Audio Setting Avail Semaphore.
-bool newMuteFlg      = false;               // New Audio Mute Setting Avail Semaphore.
-bool newPreEmphFlg   = false;               // New Radio Pre-Emphasis Setting Avail Semaphore.
-bool newRfPowerFlg   = false;               // New RfPower Setting Avail Semaphore.
-bool newVgaGainFlg   = false;               // New Analog VGA Gain Setting Avail Semaphore.
-bool rebootFlg       = false;               // Reboot System if true;
-bool stopHttpFlg     = false;               // HTTP Controller Stop Command was sent if true.
-bool stopMqttFlg     = false;               // MQTT Controller Stop Command was sent if true.
-bool stopSerialFlg   = false;               // Serial Controller Stop Command was sent if true.
-bool testModeFlg     = false;               // Audio Test Tone Mode if true. Do NOT save in config file.
-bool textSerialFlg   = false;               // Serial supplied RDS Text Avail, #1 Priority.
-bool textHttpFlg     = false;               // HTTP supplied RDS Text Avail,   #2 Priority.
-bool textMqttFlg     = false;               // MQTT supplied RDS Text Avail,   #3 Priority.
+bool mqttOnlineFlg   = false;                // MQTT is online if true.
+bool newAutoRfFlg    = false;                // new RF Auto Off Setting Avail Semaphore.
+bool newCarrierFlg   = false;                // New Carrier Settings Avail Semaphore.
+bool newDigGainFlg   = false;                // New Digital Audio Gain Setting Avail Semaphore.
+bool newGpio19Flg    = false;                // New GPIO Pin 19 State.
+bool newGpio23Flg    = false;                // New GPIO Pin 23 State.
+bool newGpio33Flg    = false;                // New GPIO Pin 33 State.
+bool newFreqFlg      = false;                // New Radio Frequency Setting Avail Semaphore.
+bool newInpImpFlg    = false;                // New Input Impedance Setting Avail Semaphore.
+bool newAudioModeFlg = false;                // New Mono/Stereo Audio Setting Avail Semaphore.
+bool newMuteFlg      = false;                // New Audio Mute Setting Avail Semaphore.
+bool newPreEmphFlg   = false;                // New Radio Pre-Emphasis Setting Avail Semaphore.
+bool newRfPowerFlg   = false;                // New RfPower Setting Avail Semaphore.
+bool newVgaGainFlg   = false;                // New Analog VGA Gain Setting Avail Semaphore.
+bool rebootFlg       = false;                // Reboot System if true;
+bool stopHttpFlg     = false;                // HTTP Controller Stop Command was sent if true.
+bool stopMqttFlg     = false;                // MQTT Controller Stop Command was sent if true.
+bool stopSerialFlg   = false;                // Serial Controller Stop Command was sent if true.
+bool testModeFlg     = false;                // Audio Test Tone Mode if true. Do NOT save in config file.
+bool textSerialFlg   = false;                // Serial supplied RDS Text Avail, #1 Priority.
+bool textHttpFlg     = false;                // HTTP supplied RDS Text Avail,   #2 Priority.
+bool textMqttFlg     = false;                // MQTT supplied RDS Text Avail,   #3 Priority.
 
-uint8_t fmRadioTestCode = FM_TEST_OK;       // FM Radio Module Test Result Code.
+uint8_t fmRadioTestCode = FM_TEST_OK;        // FM Radio Module Test Result Code.
 
-uint16_t mqttPort        = MQTT_PORT_DEF;   // mqttPort is a Fixed Value. Does not change.
-uint16_t rdsSerialPiCode = RDS_PI_CODE_DEF; // Serial Controller PI Code, can be changed by Serial Command.
-uint16_t rdsMqttPiCode   = RDS_PI_CODE_DEF; // MQTT Controller PI Code, can be changed by MQTT Command.
-uint16_t rdsHttpPiCode   = RDS_PI_CODE_DEF; // HTTP Controller PI Code, can be changed by HTTP Command.
+uint16_t mqttPort = MQTT_PORT_DEF;           // mqttPort is a Fixed Value. Does not change.
 
-int32_t rdsHttpMsgTime   = RDS_DSP_TM_DEF;  // HTTP Controller's Message Time Can be Changed by HTTP Command.
-int32_t rdsMqttMsgTime   = RDS_DSP_TM_DEF;  // MQTT Controller's Message Time Can be Changed by MQTT Command.
-int32_t rdsSerialMsgTime = RDS_DSP_TM_DEF;  // Serial Controller's Message Time Can be Changed by Serial Command.
-int32_t rdsMsgTime       = RDS_DSP_TM_DEF;  // Global (Master) RDS Message Time. Set by RDS Controllers.
+uint16_t rdsHttpPiCode   = RDS_PI_CODE_DEF;  // HTTP Controller PI Code, can be changed by HTTP Command.
+uint16_t rdsMqttPiCode   = RDS_PI_CODE_DEF;  // MQTT Controller PI Code, can be changed by MQTT Command.
+uint16_t rdsSerialPiCode = RDS_PI_CODE_DEF;  // Serial Controller PI Code, can be changed by Serial Command.
 
-float vbatVolts = 0.0f;                     // ESP32's Onboard "VBAT" Voltage. Typically 5V.
-float paVolts   = 0.0f;                     // RF Power Amp's Power Supply Voltage. Typically 9V.
+uint8_t rdsHttpPtyCode   = RDS_PTY_CODE_DEF; // HTTP Controller PTY Code, can be changed by HTTP Command.
+uint8_t rdsMqttPtyCode   = RDS_PTY_CODE_DEF; // MQTT Controller PTY Code, can be changed by MQTT Command.
+uint8_t rdsSerialPtyCode = RDS_PTY_CODE_DEF; // Serial Controller PTY Code, can be changed by Serial Command.
 
-String gpio19CtrlStr    = "";               // GPIO-19 State if Changed by Serial/MQTT/HTTP Controller.
-String gpio23CtrlStr    = "";               // GPIO-23 State if Changed by Serial/MQTT/HTTP Controller.
-String gpio33CtrlStr    = "";               // GPIO-33 State if Changed by Serial/MQTT/HTTP Controller.
-String ipAddrStr        = "";               // DHCP IP Address;
-String rdsHttpPsnStr    = RDS_PSN_DEF_STR;  // HTTP Supplied Program Service Name.
-String rdsMqttPsnStr    = RDS_PSN_DEF_STR;  // MQTT Supplied Program Service Name.
-String rdsSerialPsnStr  = RDS_PSN_DEF_STR;  // Serial Supplied Program Service Name.
-String rdsSerialTextStr = "";               // RDS RadioText for Serial Controller.
-String rdsHttpTextStr   = "";               // RDS RadioText for HTTP Controller.
-String rdsMqttTextStr   = "";               // RDS RadioText for MQTT Controller.
-String rdsTextMsgStr    = "";               // Current RDS RadioText Message.
+uint32_t rdsHttpMsgTime   = RDS_DSP_TM_DEF;  // HTTP Controller's Message Time Can be Changed by HTTP Command.
+uint32_t rdsLocalMsgTime  = RDS_DSP_TM_DEF;  // Local Controller's Message Time Can be Changed by Web UI.
+uint32_t rdsMsgTime       = RDS_DSP_TM_DEF;  // Global (Master) RDS Message Time. Set by RDS Controllers.
+uint32_t rdsMqttMsgTime   = RDS_DSP_TM_DEF;  // MQTT Controller's Message Time Can be Changed by MQTT Command.
+uint32_t rdsSerialMsgTime = RDS_DSP_TM_DEF;  // Serial Controller's Message Time Can be Changed by Serial Command.
+
+float vbatVolts = 0.0f;                      // ESP32's Onboard "VBAT" Voltage. Typically 5V.
+float paVolts   = 0.0f;                      // RF Power Amp's Power Supply Voltage. Typically 9V.
+
+String gpio19CtrlStr    = "";                // GPIO-19 State if Changed by Serial/MQTT/HTTP Controller.
+String gpio23CtrlStr    = "";                // GPIO-23 State if Changed by Serial/MQTT/HTTP Controller.
+String gpio33CtrlStr    = "";                // GPIO-33 State if Changed by Serial/MQTT/HTTP Controller.
+String ipAddrStr        = "";                // DHCP IP Address;
+String rdsHttpPsnStr    = RDS_PSN_DEF_STR;   // HTTP Supplied Program Service Name.
+String rdsMqttPsnStr    = RDS_PSN_DEF_STR;   // MQTT Supplied Program Service Name.
+String rdsSerialPsnStr  = RDS_PSN_DEF_STR;   // Serial Supplied Program Service Name.
+String rdsSerialTextStr = "";                // RDS RadioText for Serial Controller.
+String rdsHttpTextStr   = "";                // RDS RadioText for HTTP Controller.
+String rdsMqttTextStr   = "";                // RDS RadioText for MQTT Controller.
+String rdsTextMsgStr    = "";                // Current RDS RadioText Message.
 
 IPAddress hotSpotIP   = HOTSPOT_IP_DEF;
 IPAddress mqttIP      = MQTT_IP_DEF;
@@ -118,7 +140,7 @@ IPAddress wifiDNS     = WIFI_ADDR_DEF;
 IPAddress wifiGateway = WIFI_ADDR_DEF;
 
 // ************************************************************************************************
-// Configuration Vars
+// Configuration Vars (Can be saved to LittleFS and SD Card)
 
 bool apFallBackFlg = AP_FALLBACK_DEF_FLG;                  // Control, Switch to AP mode if STA fails.
 bool ctrlLocalFlg  = CTRL_LOCAL_DEF_FLG;                   // Control, Permit Local Control if true.
@@ -135,12 +157,11 @@ bool stereoEnbFlg   = STEREO_ENB_DEF_FLG;                  // Control, Enable St
 bool wifiDhcpFlg    = CTRL_DHCP_DEF_FLG;                   // Control, Use DHCP if true, else static IP.
 bool WiFiRebootFlg  = WIFI_REBOOT_DEF_FLG;                 // Control, Reboot if all connections fail.
 
-uint8_t usbVol    = (atoi(USB_VOL_DEF_STR));               // Control.
-uint8_t analogVol = (atoi(ANA_VOL_DEF_STR));               // Control.
+uint8_t analogVol = (atoi(ANA_VOL_DEF_STR));               // Control. Unused, for future expansion.
+uint8_t usbVol    = (atoi(USB_VOL_DEF_STR));               // Control. Unused, for future expansion.
 
-uint16_t rdsLocalPiCode = RDS_PI_CODE_DEF;                 // Local Controller PI Code, Fixed value.
-
-int32_t rdsLocalMsgTime = RDS_DSP_TM_DEF;                  // Control.
+uint8_t  rdsLocalPtyCode = RDS_PTY_CODE_DEF;               // Control. Local PTY Code, default for all controllers.
+uint16_t rdsLocalPiCode  = RDS_PI_CODE_DEF;                // Control. Local PI Code, default for all controllers.
 
 uint32_t baudRate = ESP_BAUD_DEF;                          // Control.
 
@@ -191,7 +212,13 @@ void setup()
     pinMode(SDA_PIN,    INPUT);        // I2C Data Pin. Do NOT Enable Internal Pullup.
     pinMode(MUX_PIN,    OUTPUT);       // Audio MUX Control (Line-In:Tone-In), Output.
     pinMode(TONE_PIN,   OUTPUT);       // PWM Audio Test Tone, Output.
-    digitalWrite(MUX_PIN, TONE_OFF);   // Init Audio Mux, Enable Audio Line-In Jack, Music LED On.
+    pinMode(SD_CS_PIN,  OUTPUT);       // SD Card Chip Select, Output.
+
+    digitalWrite(MUX_PIN,   TONE_OFF); // Init Audio Mux, Enable Audio Line-In Jack, Music LED On.
+    digitalWrite(SD_CS_PIN, HIGH);
+
+    // Initialize Tone Generator.
+    toneInit();
 
     // Initialize i2c.
     Wire.begin(SDA_PIN, SCL_PIN);
@@ -202,9 +229,9 @@ void setup()
 
     // Initialize USB Serial.
     Serial.begin(baudRate, SERIAL_8N1); // Open Serial-0 Port to Log System Messages.
-    //Serial1.begin(baudRate, SERIAL_8N1, SER1_RXD, SER1_TXD); // Optional Serial-1 Port.
-    Serial1.println("\r\n\r\n");
-    Serial1.println("COM1 NOW ALIVE");
+    // Serial1.begin(baudRate, SERIAL_8N1, SER1_RXD, SER1_TXD); // Optional Serial-1 Port.
+    // Serial1.println("\r\n\r\n");
+    // Serial1.println("COM1 NOW ALIVE");
 
     while (!Serial && !Serial.available()) {} // Wait for ESP32 Device Serial Port to be available.
     Serial.println("\r\n\r\n");
@@ -293,7 +320,7 @@ void loop()
     updateUiRSSI();         // Update the WiFi Signal Strength on UI homeTab & wifiTab.
     updateUiFreeMemory();   // Update the Memory value on UI diagTab.
     updateUiAudioLevel();   // Update the Audio Level value on UI diagtab.
-    updateUiTimer();        // Upddate the Elapsed Timer on UI diagTab.
+    updateUiDiagTimer();    // Upddate the Elapsed Timer on UI diagTab.
     updateUiVolts();        // Update the two system voltages on UI diagTab.
 
     updateRadioSettings();  // Update the QN8027 device registers.
