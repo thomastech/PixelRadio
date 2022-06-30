@@ -1,9 +1,9 @@
 /*
    File: webserver.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.1
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Jun-30-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -89,10 +89,11 @@ int16_t getCommandArg(String& requestStr, uint8_t maxSize) {
         if (argStop < 0) {
             argStop = requestStr.length();
         }
+
         argStr = requestStr.substring(argStart + 1, argStop - 1);
-        argStr = urlDecode(argStr); // Convert any URL encoded text to ASCII.
-//      argStr.replace("%20", " ");  // Replace the html space with ASCII text.
-        argStr.trim();
+        argStr.replace("%7f", " "); // Replace html encoded control "DEL" with space (Text Clear Cmd).
+        argStr.replace("%7F", " ");
+        argStr = urlDecode(argStr); // Convert all remaining html encoded text to ASCII.
 
         if (argStr.length() > maxSize) {
             argStr = argStr.substring(0, maxSize);
@@ -101,7 +102,7 @@ int16_t getCommandArg(String& requestStr, uint8_t maxSize) {
             return -1; // Fail, Argument Missing.
         }
 
-        argStr.trim(); // Trim one more time.
+        argStr.trim(); // Arg length is OK, now safe to Trim off leading and trailing spaces.
         requestStr = argStr;
     }
     else {             // Fail, Improper Argument Provided.
@@ -753,9 +754,9 @@ String urlDecode(String urlStr)
         c = urlStr.charAt(i);
 
         if (c == '%') {
-            code0 = urlStr.charAt(++i);
-            code1 = urlStr.charAt(++i);
-            c = (urlDecodeHex(code0) << 4) | urlDecodeHex(code1);
+            code0      = urlStr.charAt(++i);
+            code1      = urlStr.charAt(++i);
+            c          = (urlDecodeHex(code0) << 4) | urlDecodeHex(code1);
             encodeStr += c;
         }
         else if (c == '+') {
@@ -773,17 +774,19 @@ String urlDecode(String urlStr)
 // urlDecodeHex(): convert hex to integer base. This is companion function for urlDecode().
 unsigned char urlDecodeHex(char c)
 {
-    if (c >= '0' && c <='9'){
-        return((unsigned char)c - '0');
-    }
-    if (c >= 'a' && c <='f'){
-        return((unsigned char)c - 'a' + 10);
-    }
-    if (c >= 'A' && c <='F'){
-        return((unsigned char)c - 'A' + 10);
+    if ((c >= '0') && (c <= '9')) {
+        return (unsigned char)c - '0';
     }
 
-    return(0);
+    if ((c >= 'a') && (c <= 'f')) {
+        return (unsigned char)c - 'a' + 10;
+    }
+
+    if ((c >= 'A') && (c <= 'F')) {
+        return (unsigned char)c - 'A' + 10;
+    }
+
+    return 0;
 }
 
 // ************************************************************************************************

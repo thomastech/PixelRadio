@@ -1,9 +1,9 @@
 /*
    File: PixelRadio.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.1
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Jun-30-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -25,9 +25,9 @@
 // *********************************************************************************************
 // VERSION STRING: Must be updated with each public release.
 // The version is shown during boot on Serial Log and on the "About" UI web Tab page.
-#define VERSION_STR       "1.1.0"
+#define VERSION_STR       "1.1.1"
 #define AUTHOR_STR        "by Thomas Black"
-#define BLD_DATE_STR      "Jun-13-2022"
+#define BLD_DATE_STR      "Jun-30-2022"
 #define GITHUB_REPO_STR   "<a href=\"https://github.com/thomastech/PixelRadio/\" target=\"_blank\">Click Here for Information</a>"
 
 // *********************************************************************************************

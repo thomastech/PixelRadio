@@ -72,19 +72,25 @@ The `PROGRAM SERVICE NAME` (PSN) panel is used to enter your Station ID or Name.
 It can be up to eight characters.
 
 What you enter here will appear on the Radio Receiver's PSN field.
-Suggestions would be something like "GHOSTS!" for a halloween show.
+Suggestions would be something like "GHOSTS!" for a Halloween show.
 Or perhaps "SANTA" for your Christmas light show.
 
 >Refrain from changing the PSN name too often.
->Some receivers store the name for future searches and unneccessarily changing it may affect that feature.
+>Some receivers store the name for future searches and unnecessarily changing it may affect that feature.
 
 ### PI CODE
 
-The `PI CODE` panel is used to enter the Program Identification code for your radio station.
-The default 0x6400 setting is typically used.
+The `PI CODE` panel is used to enter the numeric Program Identification code for your radio station.
+It's a 4-digit hexadecimal number that begins with '0x'.
+It is a computed value that represents your station's four letter call sign.
+The default 0x6400 setting (station *WFVC*) can be changed.
 
-If you are interested in changing it then be sure to avoid using one that is already found in your broadcast area.
-For example, USA installations can consult online information like this one:
+A handy online calculator for converting your callsign to a hexadecimal PI Code can be found here:
+<a href="https://www.caseymediallc.com/rdsreverse.html" target="_blank">Convert Call Sign to PI Code</a>\
+Note: The call sign must be four capitalized letters. The first character of a USA based station should be a *K* or *W*.
+
+When choosing a PI Code be sure to avoid a value that is already found in your broadcast area.\
+Tip: USA installations can consult online information like this one:
 <a href="https://picodes.nrscstandards.org/fs_pi_codes_allocated.html" target="_blank">NRSC PI Codes</a>
 
 ### PTY CODE

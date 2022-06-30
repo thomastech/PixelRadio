@@ -3,7 +3,7 @@
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
    Version: 1.1.0
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Jun-30-2022
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
 
@@ -35,6 +35,8 @@
                         Performed misc code cleanup.
                         Updated Readme documentation, added photos for external WiFi antenna modification.
                         -> Validation completed on Jun-17-2022, public release approved.
+   V1.1.1, Jun-30-2022: For backwards compatibility, HTTP url commands "psn" and "rtm" can use %20 by itself to clear text.
+                        Revised Documentation, added info about HTTP Text clearing, creating PI Codes, Falcon Player.
 
    Notes:
    1. This "Arduino" project must be compiled with VSCode / Platformio. Do not use the Arduino IDE.

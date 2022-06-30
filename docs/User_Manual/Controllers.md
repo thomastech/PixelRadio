@@ -267,18 +267,40 @@ For example, to set the `Audio` mode use this URL: \
 >NOTE: It may be necessary to use the device's IP address instead of the mDNS name. Example:\
 >`http://192.168.1.37:8080.cmd?rtper=30`
 
+## HTTP PERCENT ENCODING
 It will be necessary to use HTTP *Percent Encoding* formatting on some characters sent by the Program Service Name (`psn`) and RadioText Message (`rtm`) commands.
-For example, in order to see the plus sign (+) character it must be sent as ``%2B``.
+For example, in order to display the plus sign (+) character it must be sent as ``%2B``.
 Otherwise this character will be a blank space on the RDS receiver's display.
 
 There are other non-alphanumeric characters that need this treatment too.
 When necessary, change them to their Percent Encoded value listed in <a href="https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding" target="_blank">this table</a>.
 The allowable values are hex based and must be in the range of %20 and %7E.
 
-## HTTP CONTROLLER EXAMPLE
+#### -> HELPFUL TIPS
+Use ``%3F`` to display a question mark (?).\
+Text spaces can be replaced with ``%20`` or a plus (``+``) sign.
 
-The HTTP Controller can be used with Pixel Animation Sequencers.
-We've prepared an example that uses *xLights* software: [Click Here](./xLights.md).
+### HTTP CLEAR TEXT
+Clearing the *RadioText Message* (rtm) or *Program Service Name* (psn) requires the Percent Encoding feature.
+Either the %20 or %7f hex values (your choice) can be used to erase the text.
+Send only the Percent Encoded value;
+Do NOT include any other characters when text clearing is required.\
+For example, to erase the RadioText message use URL:
+`http://pixelradio.local:8080/cmd?rtm=%20` or `http://pixelradio.local:8080/cmd?rtm=%7f`
+
+## HTTP CONTROLLER EXAMPLES
+The HTTP Controller can be used with some popular Pixel Animation Sequencers.
+This section provides examples to two different solutions that may be of interest to you.
+
+### XLIGHTS / XSCHEDULE
+*xLights* is a pixel animation software program that runs on Windows, OSX, and Linux.
+It includes a sequence player that can send HTTP commands to control PixelRadio.
+For basic instructions on how to configure *xLights* software to do this: [Click Here](./xLights.md).
+
+### FALCON PLAYER (FPP) PLUGIN
+*Falcon Player* is a pixel sequencer that runs on low cost single board computers such as the Raspberry Pi.
+It has a software plugin that is compatible with PixelRadio's HTTP controller.\
+FPP's PixelRadio plugin can be downloaded from the <a href="https://github.com/FalconChristmas" target="_blank">Falcon Christmas Repository</a>.
 
 &nbsp;&nbsp;&nbsp;
 
