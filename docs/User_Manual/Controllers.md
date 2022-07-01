@@ -265,7 +265,7 @@ The port number MUST be included in the URL.
 For example, to set the `Audio` mode use this URL: \
 `http://pixelradio.local:8080/cmd?aud=stereo`
 >NOTE: It may be necessary to use the device's IP address instead of the mDNS name. Example:\
->`http://192.168.1.37:8080.cmd?rtper=30`
+>`http://192.168.1.37:8080/cmd?rtper=30`
 
 ## HTTP PERCENT ENCODING
 It will be necessary to use HTTP *Percent Encoding* formatting on some characters sent by the Program Service Name (`psn`) and RadioText Message (`rtm`) commands.
