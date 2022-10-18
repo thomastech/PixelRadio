@@ -1,9 +1,9 @@
 /*
    File: rds.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -127,9 +127,9 @@ bool checkControllerRdsAvail(void) {
 void processRDS(void) {
     char logBuff[75 + RDS_TEXT_MAX_SZ];
     static uint8_t loop       = 0;
-    uint32_t currentMillis    = 0;
-    static uint32_t rdsMillis = 0;     // Timer for RDS Web GUI updates.
-    static uint32_t cntMillis = 0;     // Timer for ICStation FM Tx services.
+    unsigned long currentMillis    = 0;
+    static unsigned long rdsMillis = 0;     // Timer for RDS Web GUI updates.
+    static unsigned long cntMillis = 0;     // Timer for ICStation FM Tx services.
     static String   rdsRefreshPsnStr;
     static String   rdsRefreshTextStr; // RadioText Refresh, Message to repeat.
 

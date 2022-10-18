@@ -1,9 +1,9 @@
 /*
    File: PixelRadio.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.1
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-30-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -25,9 +25,9 @@
 // *********************************************************************************************
 // VERSION STRING: Must be updated with each public release.
 // The version is shown during boot on Serial Log and on the "About" UI web Tab page.
-#define VERSION_STR       "1.1.1"
+#define VERSION_STR       "1.1.2"
 #define AUTHOR_STR        "by Thomas Black"
-#define BLD_DATE_STR      "Jun-30-2022"
+#define BLD_DATE_STR      "Oct-18-2022"
 #define GITHUB_REPO_STR   "<a href=\"https://github.com/thomastech/PixelRadio/\" target=\"_blank\">Click Here for Information</a>"
 
 // *********************************************************************************************
@@ -123,7 +123,7 @@ const int XXXX_SET_ADDR  = 10;            // E2Prom Address for (unused), 16-bit
 
 // ESP32
 const uint32_t ESP_BAUD_DEF     = 115200; // Default ESP32 Baud Rate.
-const uint32_t ELAPSED_TMR_TIME = 1000;   // RDS Elapsed Time Update period, in mS. Do Not change.
+const unsigned long ELAPSED_TMR_TIME = 1000;   // RDS Elapsed Time Update period, in mS. Do Not change.
 
 // ESPUI (Web UI):
 #define ANA_VOL_MIN_STR "0"
@@ -171,7 +171,7 @@ const uint16_t FM_FREQ_SKP_MHZ = 10;     // 1MHz.
 const float PA_VOLT_MIN = 8.1f;          // Minimum allowed voltage for Power Amp, 9V -10%.
 const float PA_VOLT_MAX = 9.9f;          // Maximum allowed voltage for Power Amp, 9V + 10%.
 // Free Memory
-const uint32_t FREE_MEM_UPD_TIME = 1750; // Update time for Free Memory (on diagTab), in mS.
+const unsigned long FREE_MEM_UPD_TIME = 1750; // Update time for Free Memory (on diagTab), in mS.
 
 // GPIO Pins:
 // Note: GPIOs 34-39 do not support internal pullups or pulldowns.
@@ -243,7 +243,7 @@ const uint8_t  MQTT_USER_MAX_SZ    = 48;
 
 // Radio
 const uint16_t AUDIO_LEVEL_MAX = 675;             // Maxium Audio Level (peak mV) Measurement by QN8027.
-const uint32_t AUDIO_MEAS_TIME = 2000;            // Sample period for Audio Level Meas.
+const unsigned long AUDIO_MEAS_TIME = 2000;       // Sample period for Audio Level Meas.
 const uint8_t  RADIO_CAL_RETRY = 3;               // RF Port Calibration Retry Count (Maximum Retry Count).
 const uint8_t  RF_LOW_POWER    = 27;              // 88dBuv.
 const uint8_t  RF_MED_POWER    = 40;              // 96dBuV.
@@ -252,8 +252,8 @@ const uint8_t  RF_HIGH_POWER   = 78;              // 119dBuV. Do Not change.
 // RDS:
 const uint16_t RDS_DSP_TM_MAX   = 900;            // Maximum RadioText Display Period, in secs.
 const uint16_t RDS_DSP_TM_MIN   = 5;              // Minimum RadioText Display Period, in secs.
-const uint32_t RDS_DSP_TM_DEF   = 15000;          // Default Radio Display Period, in mS.
-const uint16_t RDS_MSG_UPD_TIME = 1000;           // RadioText UI Update Time, im mS.
+const unsigned long RDS_DSP_TM_DEF   = 15000;     // Default Radio Display Period, in mS.
+const unsigned long RDS_MSG_UPD_TIME = 1000;      // RadioText UI Update Time, im mS.
 const uint16_t RDS_PI_CODE_DEF  = 0x6400;         // Default RDS PI Code, 16-bit hex value, 0x00ff - 0xffff.
 const uint32_t RDS_PI_CODE_MAX  = 0xffff;         // Maximum PI Code Value (hex).
 const uint32_t RDS_PI_CODE_MIN  = 0x00ff;         // Minumum PI Code Value (hex).
@@ -272,7 +272,7 @@ const uint16_t RSSI_UPD_TIME = 2500;              // RSSI GUI Update time (on ho
 
 // Test Tone
 const uint8_t  TEST_TONE_CHNL = 0;                // Test Tone PWM Channel.
-const uint32_t TEST_TONE_TIME = 300;              // Test Tone Sequence Time, in mS.
+const unsigned long TEST_TONE_TIME = 300;         // Test Tone Sequence Time, in mS.
 const uint16_t TONE_A3        = 220;              // 220Hz Audio Tone.
 const uint16_t TONE_A4        = 440;
 const uint16_t TONE_C4        = 262;
@@ -295,7 +295,7 @@ const uint16_t OTA_TIMEOUT = 3000;     // Max allowed time to receive OTA data.
 const float MIN_VOLTS         = 4.5f;  // Minimum Power Supply volts.
 const float VOLTS_HYSTERESIS  = 0.15f; // Voltage Hysterisis.
 const uint16_t VOLTS_UPD_TIME = 3750;  // Power Supply Volts GUI Update time (on diagTab), in mS.
-const uint32_t CLIENT_TIMEOUT = 500;   // Webserver Client Timeout, in mS.
+const unsigned long CLIENT_TIMEOUT = 500; // Webserver Client Timeout, in mS.
 
 // Web Server
 #define HTML_HEADER_STR   "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
@@ -404,7 +404,7 @@ void   updateUiLocalMsgTime(void);
 void   updateUiLocalPiCode(void);
 void   updateUiLocalPtyCode(void);
 void   updateUiRdsText(String textStr);
-void   updateUiRDSTmr(uint32_t rdsMillis);
+void   updateUiRDSTmr(unsigned long rdsMillis);
 void   updateUiRfCarrier(void);
 void   updateUiRSSI(void);
 void   updateUiDiagTimer(void);

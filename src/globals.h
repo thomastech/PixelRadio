@@ -1,9 +1,9 @@
 /*
    File: globals.h
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -63,6 +63,11 @@ extern uint8_t analogVol;
 extern uint8_t fmRadioTestCode;
 extern uint8_t usbVol;
 
+extern uint8_t  rdsHttpPtyCode;
+extern uint8_t  rdsLocalPtyCode;
+extern uint8_t  rdsMqttPtyCode;
+extern uint8_t  rdsSerialPtyCode;
+
 extern uint16_t mqttPort;
 
 extern uint16_t rdsHttpPiCode;
@@ -70,19 +75,16 @@ extern uint16_t rdsLocalPiCode;
 extern uint16_t rdsMqttPiCode;
 extern uint16_t rdsSerialPiCode;
 
-extern uint8_t  rdsHttpPtyCode;
-extern uint8_t  rdsLocalPtyCode;
-extern uint8_t  rdsMqttPtyCode;
-extern uint8_t  rdsSerialPtyCode;
+extern uint16_t fmFreqX10;
 
 extern uint32_t baudRate;
-extern uint32_t rdsHttpMsgTime;
-extern uint32_t rdsLocalMsgTime;
-extern uint32_t rdsMqttMsgTime;
-extern uint32_t rdsSerialMsgTime;
-extern uint32_t rdsMsgTime;
 
-extern uint16_t fmFreqX10;
+extern unsigned long rdsHttpMsgTime;
+extern unsigned long rdsLocalMsgTime;
+extern unsigned long rdsMqttMsgTime;
+extern unsigned long rdsSerialMsgTime;
+extern unsigned long rdsMsgTime;
+
 extern float vbatVolts;
 extern float paVolts;
 

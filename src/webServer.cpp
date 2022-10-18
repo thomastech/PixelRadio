@@ -1,9 +1,9 @@
 /*
    File: webserver.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.1
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-30-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -233,7 +233,7 @@ void processWebClient(void)
     static bool connectFlg = false;
     bool successFlg        = true;
     uint16_t charCnt       = 0;
-    uint32_t previousTime  = millis();
+    unsigned long previousTime  = millis();
 
     String argStr       = "";
     String currentLine  = "";
@@ -795,7 +795,7 @@ void wifiReconnect(void)
 {
     uint8_t apCount = 0;
     char    charBuff[40];
-    static uint32_t previousWiFiMillis = 0; // Timer for WiFi services.
+    static unsigned long previousWiFiMillis = 0; // Timer for WiFi services.
 
     apCount = WiFi.softAPgetStationNum();
 

@@ -1,9 +1,9 @@
 /*
    File: PixelRadio.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-30-2022
+   Revised:  Oct-18-2022
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
 
@@ -37,6 +37,12 @@
                         -> Validation completed on Jun-17-2022, public release approved.
    V1.1.1, Jun-30-2022: For backwards compatibility, HTTP url commands "psn" and "rtm" can use %20 by itself to clear text.
                         Revised Documentation, added info about HTTP Text clearing, creating PI Codes, Falcon Player.
+   V1.1.2, Oct-18-2022: Updated espressif32 platform to Ver 5.2.0 (was 4.4.0).
+                        Updated ESPAsyncWebServer to Ver 3.0.0 (was 2.1.0).
+                        Updated ESPUI library to PR #199, release Oct-2022. Stored locally in project lib folder.
+                        Changed all millis() related vars to unsigned long (was uint32).
+                        Minor edits to readme doc files.
+                        -> Validation completed on Oct-18-2022, public release approved.
 
    Notes:
    1. This "Arduino" project must be compiled with VSCode / Platformio. Do not use the Arduino IDE.
@@ -113,11 +119,11 @@ uint8_t rdsHttpPtyCode   = RDS_PTY_CODE_DEF; // HTTP Controller PTY Code, can be
 uint8_t rdsMqttPtyCode   = RDS_PTY_CODE_DEF; // MQTT Controller PTY Code, can be changed by MQTT Command.
 uint8_t rdsSerialPtyCode = RDS_PTY_CODE_DEF; // Serial Controller PTY Code, can be changed by Serial Command.
 
-uint32_t rdsHttpMsgTime   = RDS_DSP_TM_DEF;  // HTTP Controller's Message Time Can be Changed by HTTP Command.
-uint32_t rdsLocalMsgTime  = RDS_DSP_TM_DEF;  // Local Controller's Message Time Can be Changed by Web UI.
-uint32_t rdsMsgTime       = RDS_DSP_TM_DEF;  // Global (Master) RDS Message Time. Set by RDS Controllers.
-uint32_t rdsMqttMsgTime   = RDS_DSP_TM_DEF;  // MQTT Controller's Message Time Can be Changed by MQTT Command.
-uint32_t rdsSerialMsgTime = RDS_DSP_TM_DEF;  // Serial Controller's Message Time Can be Changed by Serial Command.
+unsigned long rdsHttpMsgTime   = RDS_DSP_TM_DEF;  // HTTP Controller's Message Time Can be Changed by HTTP Command.
+unsigned long rdsLocalMsgTime  = RDS_DSP_TM_DEF;  // Local Controller's Message Time Can be Changed by Web UI.
+unsigned long rdsMsgTime       = RDS_DSP_TM_DEF;  // Global (Master) RDS Message Time. Set by RDS Controllers.
+unsigned long rdsMqttMsgTime   = RDS_DSP_TM_DEF;  // MQTT Controller's Message Time Can be Changed by MQTT Command.
+unsigned long rdsSerialMsgTime = RDS_DSP_TM_DEF;  // Serial Controller's Message Time Can be Changed by Serial Command.
 
 float vbatVolts = 0.0f;                      // ESP32's Onboard "VBAT" Voltage. Typically 5V.
 float paVolts   = 0.0f;                      // RF Power Amp's Power Supply Voltage. Typically 9V.

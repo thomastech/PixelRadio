@@ -99,11 +99,14 @@ The QN8027 RF Module must be installed directly on the PCB using the SIP Header 
 The header strips will provide a 2-3mm gap between the main PCB and the RF module.
 Do **NOT** use a plug-in socket to mount the RF module.
 
-### FRONT PANEL LED
+### FRONT PANEL LED (MUSIC-ON STATUS)
 
-The green LED (Music-On indicator) requires long leads to reach the front panel.
+The green "*Music On*" LED requires long leads to reach the front panel.
 Before soldering, temporarily position the enclosure's front panel and bend the LED's leads as needed.
 Then solder in place.
+
+>Note: The *Music On* LED will be illuminated when the external audio (music source) is enabled.
+It will turn off whenever the [Test Tone](../User_Manual/AdjustTab.md) function is active.
 
 ### ESP32 INSTALLATION
 The LilyGo TTGO-T8 ESP32 MCU includes a 2-pin wire pigtail cable.

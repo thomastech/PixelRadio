@@ -1,9 +1,9 @@
 /*
    File: webGUI.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -21,12 +21,14 @@
 
    ESPUI NOTES:
    ============
-   NOTE 1. This project uses iangray001's patched release of ESPUI Library created
-   on Feb-16-2022.
-   I've found that the PR releases often introduce undesireable bugs. So I suggest
-   staying with this release until there is a strong reason to try a newer version.
+   NOTE 1. The ESPUI (Web GUI) library is locally stored in the project's lib folder.
 
-   NOTE 2.
+   NOTE 2. This project uses the ESPUI Library commit from PR #199 submitted in Oct 2022.
+   See https://github.com/s00500/ESPUI/pull/199
+   I suggest staying with this release until there is a strong reason to try a newer
+   version.
+
+   NOTE 3.
    Custom Updates to the ESPUI Library:
    Any edits to the ESPUI library must be done in the Project's library folder. After
    editing, the ESPUI minified and .h files must be prepared (rebuilt) using the
@@ -524,7 +526,7 @@ void startGUI(void)
 void updateUiAudioLevel(void)
 {
     uint16_t mV;
-    static uint32_t previousMillis = 0;
+    static unsigned long previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {
@@ -646,7 +648,7 @@ void updateUiIpaddress(String ipStr)
 void updateUiFreeMemory(void)
 {
     char logBuff[40];
-    static uint32_t oldMillis = millis();
+    static unsigned long oldMillis = millis();
 
     if (millis() > oldMillis + FREE_MEM_UPD_TIME) {
         oldMillis = millis();
@@ -711,9 +713,9 @@ void updateUiRdsText(String textStr)
 //                    On Entry rdsMillis=snapshot time for countdown calc.
 //                    Or pass 0 to force "Expired" message.
 //                    Test mode clears the time field.
-void updateUiRDSTmr(uint32_t rdsMillis)
+void updateUiRDSTmr(unsigned long rdsMillis)
 {
-     uint32_t timeCnt = 0;
+    unsigned long timeCnt = 0;
 
     if (testModeFlg) {
         ESPUI.print(homeRdsTmrID, " ");
@@ -770,7 +772,7 @@ void updateUiRfCarrier(void)
 //               Note: AP Mode doesn't receive a RSSI sgnal from a router, so it returns a special message.
 void updateUiRSSI(void)
 {
-    static uint32_t previousMillis = 0;
+    static unsigned long previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {
@@ -831,8 +833,8 @@ void updateUiDiagTimer(void)
     static uint8_t  minutes        = 0;
     static uint8_t  hours          = 0;
     static int16_t  days           = 0;
-    static uint32_t previousMillis = millis();
-    uint32_t currentMillis         = millis();
+    static unsigned long previousMillis = millis();
+    unsigned long currentMillis         = millis();
 
     if ((currentMillis - previousMillis) >= 1000) {
         previousMillis = millis() - ((currentMillis - previousMillis) - 1000);
@@ -860,7 +862,7 @@ void updateUiDiagTimer(void)
 // ************************************************************************************************
 void updateUiVolts(void)
 {
-    static uint32_t previousMillis = 0;
+    static unsigned long previousMillis = 0;
     char logBuff[60];
 
     if (previousMillis == 0) {

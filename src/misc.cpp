@@ -1,9 +1,9 @@
 /*
    File: misc.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech
@@ -280,9 +280,9 @@ void updateTestTones(bool resetTimerFlg)
     static uint8_t  minutes     = 0;
     static uint8_t  seconds     = 0;
     static uint8_t  state       = 0;
-    static uint32_t clockMillis = millis();
-    static uint32_t timerMillis = millis();
-    uint32_t currentMillis      = millis();
+    static unsigned long clockMillis = millis();
+    static unsigned long timerMillis = millis();
+    unsigned long currentMillis      = millis();
 
     const uint16_t toneList[] =
     { TONE_NONE, TONE_NONE, TONE_NONE, TONE_A3, TONE_E4, TONE_A3, TONE_C4, TONE_C5, TONE_F4, TONE_F4, TONE_A4, TONE_NONE };
@@ -293,6 +293,8 @@ void updateTestTones(bool resetTimerFlg)
         return;
     }
     else if (!testModeFlg) {
+        clockMillis = millis();
+        timerMillis = millis();
         goFlg = false;
         state = 0;
         digitalWrite(MUX_PIN, TONE_OFF); // Switch Audio Mux chip to Line-In.

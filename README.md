@@ -122,6 +122,7 @@ Web page disconnects may occur randomly. Simply refresh the browser if this occu
 ```
 1.0   : Apr-05-2022, PixelRadio V1.0, official release to the public.
 1.1.1 : Jun-30-2022, PixelRadio V1.1,1, See release for changelog.
+1.1.2 : Oct-18-2022, PixelRadio V1.1,2, See release for changelog.
 ```
 
 &nbsp;&nbsp;&nbsp;

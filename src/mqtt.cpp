@@ -1,9 +1,9 @@
 /*
    File: mqtt.cpp
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -271,8 +271,8 @@ void mqttInit(void) {
 void mqttReconnect(bool resetFlg)
 {
     char logBuff[120];
-    static uint8_t  mqttRetryCount     = 0;        // MQTT Connection Retry Counter. Each reconnect attempt is allowed several tries.
-    static uint32_t previousWiFiMillis = millis(); // Timer for WiFi services.
+    static uint8_t  mqttRetryCount = 0;                 // MQTT Connection Retry Counter, allow several attempts.
+    static unsigned long previousWiFiMillis = millis(); // Timer for WiFi services.
     char   payloadBuff[40];
     String topicStr;
 
@@ -365,7 +365,7 @@ void mqttSendMessages(void)
     static bool refresh = true;
     char logBuff[120];
     char payloadBuff[35];
-    static uint32_t previousMqttMillis = millis(); // Timer for MQTT services.
+    static unsigned long previousMqttMillis = millis(); // Timer for MQTT services.
     static float    oldVbatVolts       = -1.0f;
     static float    oldPaVolts         = -1.0f;
     String topicStr;

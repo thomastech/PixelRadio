@@ -1,9 +1,9 @@
 /*
    File: callBacks.cpp (ESPUI Web Page Callback Functions)
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
-   Version: 1.1.0
+   Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Jun-13-2022
+   Revised:  Oct-18-2022
    Revision History: See PixelRadio.cpp
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
@@ -350,8 +350,8 @@ void controllerCallback(Control *sender, int type)
 void diagBootCallback(Control *sender, int type)
 {
     char logBuff[60];
-    uint32_t currentMillis    = millis(); // Snapshot of System Timer.
-    static uint32_t oldMillis = 0;
+    unsigned long currentMillis    = millis(); // Snapshot of System Timer.
+    static unsigned long oldMillis = 0;
 
     // sprintf(logBuff, "diagBootCallback ID: %d, Value: %s", sender->id, sender->value.c_str());
     // Log.verboseln(logBuff);
@@ -817,7 +817,7 @@ void rdsDisplayTimeCallback(Control *sender, int type)
     }
     displaySaveWarning();
     Log.infoln("Local RDS Message Time Set to: %u.", timerVal);
-    rdsLocalMsgTime = ((uint32_t)(timerVal)) * 1000; // Convert Secs to mSecs.
+    rdsLocalMsgTime = ((unsigned long)(timerVal)) * 1000; // Convert Secs to mSecs.
 }
 
 // ************************************************************************************************

@@ -4,7 +4,8 @@
 
 ESPUI is a simple library to make a web-based user interface for your projects using
 the **ESP8266** or the **ESP32** It uses web sockets and lets you create,
-control, and update elements on your GUI through multiple devices like phones
+
+ol, and update elements on your GUI through multiple devices like phones
 and tablets.
 
 ESPUI uses simple Arduino-style syntax for creating a solid, functioning user
@@ -27,6 +28,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
   * [Slider](#slider)
   * [Number Input](#number-input)
   * [Text Input](#text-input)
+  * [Date, Time, Colour and Password Input](#date-time-colour-and-password-input)
   * [Select control](#select-control)
   * [Getting the Time](#getting-the-time)
   * [Separators](#separators)
@@ -41,6 +43,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
   * [Grouped controls](#grouped-controls)
   * [Wide controls](#wide-controls)
   * [Graph (Experimental)](#graph--experimental-)
+  * [Captive Portal](#captive-portal)
 - [Notes for Development](#notes-for-development)
 - [Contribute](#contribute)
 
@@ -58,6 +61,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Transport layer rework by @iangray001
 - Time control by @iangray001
 - Vertical controls by @iangray001
+- Time/date/password/color input types by @pcbbc
 
 ## Roadmap
 
@@ -133,6 +137,7 @@ more program memory to work with.
 - Control pad
 - Slider
 - Text Input
+- Date, Time, Colour and Password Input
 - Numberinput
 - Option select
 - Separator
@@ -142,26 +147,59 @@ more program memory to work with.
 
 ## Documentation
 
-The heart of ESPUI is
-[ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's
-frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like
-lightweight [zepto.js](https://zeptojs.com/) for handling events. The
-communication between the ESP and the client browser works using web
-sockets. ESPUI does not need network access and can be used in standalone access
-point mode, all resources are loaded directly from the ESPs memory.
+The heart of ESPUI is [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for handling events. The communication between the ESP and the client browser works using web sockets. ESPUI does not need network access and can be used in standalone access point mode, all resources are loaded directly from the ESPs memory.
+<br><br>
+This section will explain in detail how the Library is to be used from the Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object `ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the interface that calls the `myCallback(Control *sender, int eventname)` function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events, an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement.
+<br><br>
+Alternativly you may use the extended callback funtion which provides three parameters to the callback function `myCallback(Control *sender, int eventname, void * UserParameter)`. The `UserParameter` is provided as part of the `ESPUI.addControl` method set and allows the user to define contextual information that is to be presented to the callback function in an unmodified form. 
+<br><br>
+The below example creates a button and defines a lambda function to implicitly create an `ExtendedCallback` which then invokes a more specialized button callback handler. The example uses the `UserParameter` to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map / lookup translation of the Sender Id to an object reference. 
+```
+void YourClassName::setup()
+{
+  ButtonElementId = ESPUI.addControl(
+  ControlType::Button,
+  ButtonLabel.c_str(),
+  " Button Face Text ",
+  ControlColor::None,
+  ParentElementId,
+  [](Control *sender, int eventname, void* param)
+  {
+    if(param)
+    {
+      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
+    }
+  },
+  this); // <-Third parameter for the extended callback
 
-This section will explain in detail how the Library is to be used from the
-Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements.
-This is done by calling the corresponding library methods on the Library object
-`ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the
-interface that calls the `myCallback(Control *sender, int value)` function when changed. All buttons and
-items call their callback whenever there is a state change from them. This means
-the button will call the callback when it is pressed and also again when it is
-released. To separate different events an integer number with the event name is
-passed to the callback function that can be handled in a `switch(){}case{}`
-statement.
-
-
+  // or
+  ButtonElementId = ESPUI.button(
+  " Button Face Text ",
+  [](Control *sender, int eventname, void* param)
+  {
+    if(param)
+    {
+      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
+    }
+  },
+  this); // <-Third parameter for the extended callback
+}
+```
+```
+void YourClassName::myButtonCallback(Control* sender, int eventname)
+{
+  if (eventname == B_DOWN)
+  {
+    // Handle the button down event
+  }
+  else if (eventname == B_UP)
+  {
+    // Handle the button up event
+  }
+}
+```
+<br>
+<br>
 #### Button
 
 ![Buttons](docs/ui_button.png)
@@ -287,6 +325,36 @@ because it is easy to bypass client-side checks. Never trust user input.
 
 Events:
  - `T_VALUE` - Fired when a text value changes.
+
+
+#### Date, Time, Colour and Password Input
+
+![text](docs/ui_inputtypes.png)
+
+As an extension to the text input control, you can also specify the type attribute to be used for the HTML input element.
+This allows you to easily create input controls for Date, Time, Colour and Passwords, or indeed any other
+[HTML Input Types](https://www.w3schools.com/html/html_form_input_types.asp) supported by your browser. 
+
+```
+text_date = ESPUI.text("Date", callback, ControlColor::Dark, "2022-05-24");
+ESPUI.setInputType(text_date, "date");
+
+text_time = ESPUI.text("Time", callback, ControlColor::Dark, "13:00");
+ESPUI.setInputType(text_time, "time");
+
+text_colour = ESPUI.text("Colour", callback, ControlColor::Dark, "#FF0000");
+ESPUI.setInputType(text_colour, "color");
+
+text_password = ESPUI.text("Password", callback, ControlColor::Dark, "tiddles123");
+ESPUI.setInputType(text_password, "password");
+```
+
+*Important!* This function should be called _before_ `ESPUI.begin` or results will be unreliable.
+
+Note that not all browsers support all input types, and that the control displayed to edit the input is browser dependent.
+
+However even with a type set, user input should still be validated 
+because it is easy to bypass client-side checks. Never trust user input.
 
 
 #### Select control
@@ -575,6 +643,17 @@ Use `ESPUI.addGraphPoint(graphId, random(1, 50));` to add a new value at the cur
 Graph points are saved in the browser in **localstorage** to be persistant, clear local storageto remove the points or use clearGraph() from a bbutton callback to provide a clear button.
 
 _There are many issues with the graph component currently and work is ongoing. Consider helping us out with development!_
+
+### Captive Portal
+
+ESPUI will redirect all unknown URLs it is asked for to the 'root' of the local HTTP server instead of responding with an HTTP code 404. This makes it act as a simple 'captive portal'. Note you must also set up the ESP to be a DNS server that responds to all DNS requests with the IP address of the ESP. This only effective when the ESP is acting as a WiFi hotspot in AP mode and assigning itself as the DNS server to connected clients. 
+
+All the example sketches include the DNS related code and will work as captive portals when used as a hotspot. In the event you wish to disable this feature you can do so by removing the DNS server code and adding the code below.
+
+```
+ESPUI.captivePortal = false;
+```
+
 
 # Notes for Development
 

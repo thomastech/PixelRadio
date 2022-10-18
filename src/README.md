@@ -16,10 +16,10 @@ The target device is a LilyGO TTGO-T8 ESP32 microcontroller.
 <img style="padding-right: 10px; padding-bottom: 20px;" align="left" src="../docs/Images/platformioLogo1_175.png" width="75">
 
 Compiling the source code requires VSCode with the [PlatformIO IDE](https://platformio.org/platformio-ide) extension.
-Current release compiles on PlatformIO Core 6.0.2, Home 3.4.2.
+Current release compiles on PlatformIO Core 6.1.4, Home 3.4.3.
 
 The software is written in C and requires PlatformIO's Espressif32 board platform and Arduino framework.
-Current release was built using Espressif32 4.4.0.
+Current release was built using Espressif32 5.2.0.
 
 This project uses open source ESP32 Arduino Libraries.
 However, the source code will not successfully compile with the Arduino IDE. Please use PlatformIO.
