@@ -3,7 +3,7 @@
    Project: PixelRadio, an RBDS/RDS FM Transmitter (QN8027 Digital FM IC)
    Version: 1.1.2
    Creation: Dec-16-2021
-   Revised:  Oct-18-2022
+   Revised:  Oct-24-2022
    Project Leader: T. Black (thomastech)
    Contributors: thomastech, dkulp
 
@@ -37,7 +37,7 @@
                         -> Validation completed on Jun-17-2022, public release approved.
    V1.1.1, Jun-30-2022: For backwards compatibility, HTTP url commands "psn" and "rtm" can use %20 by itself to clear text.
                         Revised Documentation, added info about HTTP Text clearing, creating PI Codes, Falcon Player.
-   V1.1.2, Oct-18-2022: Updated espressif32 platform to Ver 5.2.0 (was 4.4.0).
+   V1.1.2, Oct-18-2022: Updated espressif32 platform to Ver 5.2.0 (was 4.4.0). Core now 6.1.4, was 6.0.2.
                         Updated ESPAsyncWebServer to Ver 3.0.0 (was 2.1.0).
                         Updated ESPUI library to PR #199, release Oct-2022. Stored locally in project lib folder.
                         Changed all millis() related vars to unsigned long (was uint32).

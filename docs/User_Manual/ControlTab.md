@@ -20,9 +20,9 @@ There are four different controllers and each can be used to execute RadioText c
 
 ---
 
-## USER SERIAL CONTROL SETTINGS
+## USB SERIAL CONTROL SETTINGS
 
-The `USER SERIAL CONTROL SETTINGS` group is used to configure a USB connected Serial Controller.
+The `USB SERIAL CONTROL SETTINGS` group is used to configure a USB connected Serial Controller.
 It can be disabled if a Serial Controller is not used.
 
 ### SERIAL CONTROL
