@@ -245,7 +245,7 @@ YOU must accept all responsibility for the construction and use of the project.*
       <tr valign="top">
         <td align="right">1</td>
         <td align="left">U1</td>
-        <td align="left">CD4052BCN</td>
+        <td align="left">CD4052BE</td>
         <td align="left">CMOS Analog MUX IC, 16P DIP</td>
       </tr>
       <tr valign="top">
