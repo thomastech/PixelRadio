@@ -86,7 +86,7 @@ It is a computed value that represents your station's four letter call sign.
 The default 0x6400 setting (station *WFVC*) can be changed.
 
 A handy online calculator for converting your callsign to a hexadecimal PI Code can be found here:
-<a href="https://www.caseymediallc.com/rdsreverse.html" target="_blank">Convert Call Sign to PI Code</a>\
+<a href="https://db.wtfda.org/rds2.html" target="_blank">Convert Call Sign to PI Code</a>\
 Note: The call sign must be four capitalized letters. The first character of a USA based station should be a *K* or *W*.
 
 When choosing a PI Code be sure to avoid a value that is already found in your broadcast area.\
