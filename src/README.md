@@ -30,6 +30,10 @@ However, the source code will not successfully compile with the Arduino IDE. Ple
 
 # INSTALLING THE FIRMWARE
 
+PixelRadio's web interface (HTML, CSS, and JavaScript) is embedded in the compiled firmware. These files do not require a separate filesystem upload.
+
+PixelRadio uses the ESP32's LittleFS filesystem to store configuration settings and the radio logo image. The configuration files are created and maintained automatically by the firmware. For a new installation, only the RadioLogo225x75_base64.gif support file needs to be installed separately. This is done using a microSD card, as described below.
+
 The firmware can be installed two ways.
 The recommended method uses the PlatformIO IDE.
 But an alternate method is to use the uploader program that is provided by `Espressif`.
@@ -62,8 +66,14 @@ Click the Upload function to build the firmware and perform the Upload.
 Simply repeat the Upload and the missing dependencies will be added to the project so it can be built.
 A successful build will automatically launch the file uploader and Flash the ESP32 device.
 
-4. After a successful Upload, execute PlatformIO's `Upload Filesystem Image` function.
-This will Flash the data files needed by PixelRadio.
+4. After successfully uploading the firmware, install the radio logo image using a microSD card:
+
+    Format a microSD card (32 GB or smaller) as FAT32.
+    Copy RadioLogo225x75_base64.gif from the project's data folder to the root directory of the microSD card. Do not rename the file.
+    Disconnect the ESP32 from USB power, insert the microSD card, and apply power.
+    Wait approximately one minute for PixelRadio to copy the logo image into LittleFS, then remove the microSD card.
+
+Important: PlatformIO's Upload Filesystem Image function is not required. The web interface is already included in the firmware, and PixelRadio automatically manages its LittleFS configuration files. The microSD logo installation is normally needed only during the initial installation or after erasing the LittleFS partition. It is not necessary for routine firmware updates when the logo is already installed.
 
 
 ## ALTERNATE UPLOAD METHOD (ESP32 Uploader)
@@ -120,15 +130,14 @@ Flashing takes about a minute.
 If the upload fails then check your settings and try again.\
 Unplug the ESP32 after the upload is successful.
 
-8. One support file must be manually added using a microSD card.\
-The microSD Card (32GB or less) must be formatted as FAT32.\
-Copy the `RadioLogo225x75_base64.gif` file from the project data folder to the SD Card.\
-Do NOT rename the file.
+8. After successfully flashing the four firmware binary files, install the radio logo image:
 
-9. Insert the SD Card into the ESP32 and apply power.\
-Wait one minute then remove the SD card.
+    Format a microSD card (32 GB or smaller) as FAT32.
+    Copy RadioLogo225x75_base64.gif from the project's data folder to the root directory of the microSD card. Do not rename the file.
+    With the ESP32 powered off, insert the microSD card and apply power. Wait approximately one minute for PixelRadio to copy the logo image into LittleFS, then remove the microSD card.
+    PixelRadio is now ready to use. No additional firmware or filesystem images need to be uploaded.
 
-10. PixelRadio is now ready to use.
+>Note: The microSD logo installation is normally needed only during the initial installation or after erasing the LittleFS partition. It is not necessary for routine firmware updates when the logo is already installed.
 
 &nbsp;&nbsp;&nbsp;
 
