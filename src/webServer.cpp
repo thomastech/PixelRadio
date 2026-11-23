@@ -251,6 +251,11 @@ void processWebClient(void)
             previousTime = millis();
         }
 
+        // 25ms wait so curl's HTTP GET packet has time to arrive over Wi-Fi after the TCP handshake
+        unsigned long waitStart = millis();
+        while (client.connected() && !client.available() && (millis() - waitStart < 25)) {
+        delay(1);
+        }
         if (!client.available()) { // If no bytes available then this is a Browser Prefetch.
             Log.infoln("-> HTTP Controller: Empty Prefetch, Close Connection.");
             client.stop();
@@ -722,6 +727,9 @@ void processWebClient(void)
         requestLcStr = "";
 
         connectFlg = false;
+        // Resolve Server returned nothing (no headers, no data) error in FPP
+        client.flush();    // Wait for outgoing TCP buffer to finish sending
+        delay(5);          // Give the Wi-Fi stack 5ms to transmit the packet
         client.stop();     // Close the GET HTTP connection.
         Log.infoln("-> HTTP Controller: Client Disconnected.");
     }
