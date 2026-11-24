@@ -551,30 +551,29 @@ uint8_t QN8027Radio::getPTYCode(void){
 
 //-------------------RDS sending---------------------------------------------------------------
 /*
-Sends Program Service Name (PSN = Station ID) such as "KZAP FM" to a RDS enabled receiver.
-PSN must be maximum 8 byte long String.
-PSN shorter than 8 bytes will contain a null termination. This tells the RDS Receiver when to end decoding.
+Sends Program Service Name (PSN = Station ID) such as "KZAP FM" to an RDS enabled receiver.
+PSN is a fixed 8-byte field padded with trailing spaces (0x20) per IEC 62106 / NRSC-4.
 */
 void QN8027Radio::sendStationName(String SN){
-    char char_array[PSN_SIZE+1];
-    int str_len;
-    int rds_len;
+	char char_array[PSN_SIZE];
 
-    if(SN.length() > PSN_SIZE) {            // Prevent Buffer Overflow.
-        SN = SN.substring(0, PSN_SIZE);
-    }
+	if (SN.length() > PSN_SIZE) {
+		SN = SN.substring(0, PSN_SIZE);
+	}
 
-	str_len = SN.length() + 1;
-	rds_len = str_len + (str_len%2);    // Make it a multiple of 2.
+	// Fill all 8 characters with spaces (0x20) and copy the station name
+	memset(char_array, ' ', PSN_SIZE);
+	memcpy(char_array, SN.c_str(), SN.length());
 
-    memset(char_array,char(NULL),PSN_SIZE); // Clear PSN Buffer (fill with nulls). Mod By TEB, Feb-03-2022.
-	SN.toCharArray(char_array, str_len);
+	uint8_t ptyHi = (ptyCode & 0x18) >> 3; // top 2 bits of PTY in bottom 2 bits of byte 3
+	uint8_t ptyLo = (ptyCode << 5) & 0xE0; // bottom 3 bits of PTY in top 3 bits of byte 4
 
-	for(int i=0;i<rds_len;i+=2){
-        if(i>=PSN_SIZE) break; // Prevent RDS buffer overflow. Mod By TEB, Jan-31-2022.
-        uint8_t ptyHi = (ptyCode & 0x18) >> 3; //top 2 bits of PTY are in bottom 2 bits of byte 3, Mod By dkulp, Jun-13-2022
-        uint8_t ptyLo = (ptyCode << 5) & 0xE0; //bottom 3 bits of PTY are in top 3 bits of byte 4, Mod By dkulp, Jun-13-2022
-		sendRDS(highByte(piCode),lowByte(piCode),ptyHi, ptyLo | (0x08+(i/2)),0xE0,0xCD,char_array[i],char_array[i+1]);
+	// Always transmit all 4 Group 0A segments (8 bytes total)
+	for (int i = 0; i < PSN_SIZE; i += 2) {
+		sendRDS(highByte(piCode), lowByte(piCode),
+		        ptyHi, ptyLo | (0x08 + (i / 2)),
+		        0xE0, 0xCD,
+		        char_array[i], char_array[i + 1]);
 		waitForRDSSend();
 	}
 }
@@ -599,30 +598,39 @@ void QN8027Radio::waitForRDSSend(){
     rdsSentStatus = status;
 }
 /*Sends Song Artist Album Name. RT must be maximum 64 Byte long*/
-//RadioText shorter than 64 bytes will contain a null termination. This tells the RDS Receiver when to end decoding.
-/* Execution time is about 1.2mS */
 void QN8027Radio::sendRadioText(String RT){
-	char char_array[RADIOTEXT_SIZE+1];
-    int rds_len;
-    int str_len;
+	static String lastRT = "";
+	static bool textAB = false;
+	char char_array[RADIOTEXT_SIZE];
 
-    if(RT.length() > RADIOTEXT_SIZE) {            // Prevent Buffer Overflow.
-         RT = RT.substring(0, RADIOTEXT_SIZE);
-    }
+	if (RT.length() > RADIOTEXT_SIZE) {
+		RT = RT.substring(0, RADIOTEXT_SIZE);
+	}
 
-	str_len = RT.length() + 1;
-	rds_len = str_len + (str_len%4);             // Make it a multiple of 4.
-    memset(char_array, char(NULL), RADIOTEXT_SIZE); // Clear RadioText Buffer (fill with nulls). Mod By TEB, Feb-03-2022.
-	RT.toCharArray(char_array, str_len);            // Copy RadioText to Buffer.
+	// 1. Toggle the Text A/B flag (bit 4 = 0x10) ONLY when the message text changes
+	if (RT != lastRT) {
+		textAB = !textAB;
+		lastRT = RT;
+	}
 
-	for (int i=0;i<rds_len;i+=4){
-        if (i >= RADIOTEXT_SIZE) break; // Prevent RDS buffer overflow. Mod By TEB, Jan-31-2022.
-        uint8_t ptyHi = (ptyCode & 0x18) >> 3; //top 2 bits of PTY are in bottom 2 bits of byte 3, Mod By dkulp, Jun-13-2022
-        uint8_t ptyLo = (ptyCode << 5) & 0xE0; //bottom 3 bits of PTY are in top 3 bits of byte 4, Mod By dkulp, Jun-13-2022
-		sendRDS(highByte(piCode),lowByte(piCode),0x20 | ptyHi,ptyLo | (i/4),char_array[i],char_array[i+1],char_array[i+2],char_array[i+3]);
+	// 2. Fill all 64 bytes with spaces (0x20), copy text, and append 0x0D (CR) terminator
+	memset(char_array, ' ', RADIOTEXT_SIZE);
+	memcpy(char_array, RT.c_str(), RT.length());
+	if (RT.length() < RADIOTEXT_SIZE) {
+		char_array[RT.length()] = 0x0D;
+	}
+
+	// 3. Transmit all 16 segments (64 bytes) with PI, PTY, and Text A/B bit
+	uint8_t ptyHi = (ptyCode & 0x18) >> 3;
+	uint8_t ptyLo = (ptyCode << 5) & 0xE0;
+	uint8_t abBit = textAB ? 0x10 : 0x00;
+
+	for (int i = 0; i < RADIOTEXT_SIZE; i += 4) {
+		sendRDS(highByte(piCode), lowByte(piCode),
+		        0x20 | ptyHi, ptyLo | abBit | (i / 4),
+		        char_array[i], char_array[i+1], char_array[i+2], char_array[i+3]);
 		waitForRDSSend();
 	}
 }
-
 
 // Written By ManojBhakarPCM.
